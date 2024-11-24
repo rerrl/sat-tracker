@@ -18,6 +18,6 @@ function getUsersHomePath() {
   return app.getPath("home");
 }
 
-export function getDataPath() {
-  return path.join(getUsersHomePath(), ".sat-tracker", "data");
+export function getAppDataFolder() {
+  return path.join(getUsersHomePath(), ".sat-tracker");
 }

@@ -1,8 +1,25 @@
-export function loadAppData() {
-  console.log("loadAppData");
+import { getAppDataFolder } from "../pathResolver.js";
+import fs from "fs";
 
-  // fake a response:
-  return "some fake data";
+export function loadAppData() {
+  const path = getAppDataFolder();
+
+  // make the directory if it doesn't exist
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path, { recursive: true });
+  }
+
+  // open the file or create it if it doesn't exist
+  const filePath = path + "/data.txt";
+
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, "default data");
+  }
+
+  // read the file
+  const data = fs.readFileSync(filePath, "utf8");
+
+  return data;
 }
 
 // export function loadFile(path: string) {

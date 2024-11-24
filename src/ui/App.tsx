@@ -7,14 +7,14 @@ function App() {
   const [appData, setAppData] = useState("");
 
   useEffect(() => {
-    window.electron.loadAppData().then((data) => {
-      setAppData(data);
-    });
+    // window.electron.loadAppData().then((data) => {
+    //   setAppData(data);
+    // });
 
-    const unsub = window.electron.subscribeStatistics((statistics) =>
-      console.log(statistics)
-    );
-    return unsub;
+    // const unsub = window.electron.subscribeStatistics((statistics) =>
+    //   console.log(statistics)
+    // );
+    // return unsub;
   }, []);
 
   return (
@@ -29,6 +29,9 @@ function App() {
         <button
           onClick={() => {
             setCount((count) => count + 1);
+            window.electron.loadAppData().then((data) => {
+              setAppData(data);
+            });
           }}
         >
           count is {count}

@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import { ipcMainHandle, isDev } from "./util.js";
 import { getStaticData, pollResources } from "./managers/resource.js";
-import { getDataPath, getPreloadPath, getUIPath } from "./pathResolver.js";
+import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { loadAppData } from "./managers/data.js";
 
 app.on("ready", () => {

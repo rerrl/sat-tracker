@@ -20,7 +20,12 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button
+          onClick={() => {
+            setCount((count) => count + 1);
+            window.electron.getStaticData().then((data) => console.log(data));
+          }}
+        >
           count is {count}
         </button>
         <p>

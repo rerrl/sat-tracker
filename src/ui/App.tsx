@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
+import EntriesList from "./Components/EntriesList";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -38,35 +39,38 @@ function App() {
 
   return (
     <div className="container">
-      <div className="row">
-        <div className="item">
-          <p>Bitcoin Price</p>
-          <p>{formatUsd(topStats.bitcoinPrice)}</p>
+      <div>
+        <div className="row">
+          <div className="metric-item">
+            <p>Bitcoin Price</p>
+            <p>{formatUsd(topStats.bitcoinPrice)}</p>
+          </div>
+          <div className="metric-item">
+            <p>Total Return</p>
+            <p>{formatUsd(topStats.totalReturn)}</p>
+          </div>
+          <div className="metric-item">
+            <p>Total Sats</p>
+            <p>{formatSats(topStats.totalSats)}</p>
+          </div>
         </div>
-        <div className="item">
-          <p>Total Return</p>
-          <p>{formatUsd(topStats.totalReturn)}</p>
-        </div>
-        <div className="item">
-          <p>Total Sats</p>
-          <p>{formatSats(topStats.totalSats)}</p>
-        </div>
-      </div>
 
-      <div className="row">
-        <div className="item">
-          <p>Value USD</p>
-          <p>{formatUsd(topStats.valueUSD)}</p>
-        </div>
-        <div className="item">
-          <p>Average Entry</p>
-          <p>{formatUsd(topStats.averageEntry)}</p>
-        </div>
-        <div className="item">
-          <p>Total Invested</p>
-          <p>{formatUsd(topStats.totalInvested)}</p>
+        <div className="row">
+          <div className="metric-item">
+            <p>Value USD</p>
+            <p>{formatUsd(topStats.valueUSD)}</p>
+          </div>
+          <div className="metric-item">
+            <p>Average Entry</p>
+            <p>{formatUsd(topStats.averageEntry)}</p>
+          </div>
+          <div className="metric-item">
+            <p>Total Invested</p>
+            <p>{formatUsd(topStats.totalInvested)}</p>
+          </div>
         </div>
       </div>
+      <EntriesList />
     </div>
   );
 }

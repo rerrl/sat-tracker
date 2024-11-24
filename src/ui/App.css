@@ -37,6 +37,26 @@
   padding: 2em;
 }
 
-.read-the-docs {
-  color: #888;
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center-aligns the rows if container width is greater than its parent */
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  justify-content: center; /* Use center for even spacing with flex-grow */
+  width: 100%;
+  max-width: 1200px; /* Increase max-width for larger screens */
+  margin: 0 auto 20px; /* Center the row and add bottom margin */
+}
+
+.item {
+  flex-grow: 1; /* Allows the items to grow and take available space */
+  text-align: center; /* Center text in items */
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  min-width: 150px; /* Set a minimum width for small screens */
+  margin: 0 10px; /* Add some space between items for small screens */
 }

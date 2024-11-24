@@ -1,7 +1,7 @@
 import { getAppDataFolder } from "../pathResolver.js";
 import fs from "fs";
 
-export function loadAppData() {
+export function loadAppData(): string {
   const path = getAppDataFolder();
 
   // make the directory if it doesn't exist

@@ -8,12 +8,15 @@ electron.contextBridge.exposeInMainWorld("electron", {
     return ipcOn("statistics", (statistics) => callback(statistics));
   },
   getStaticData: () => ipcInvoke("getStaticData"),
+  loadAppData: () => ipcInvoke("loadAppData"),
+  // loadFile: (path: string) => ipcInvoke("loadFile", path),
 } satisfies Window["electron"]);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
-  key: Key
+  key: Key,
+  ...args: any[]
 ): Promise<EventPayloadMapping[Key]> {
-  return electron.ipcRenderer.invoke(key);
+  return electron.ipcRenderer.invoke(key, ...args);
 }
 
 function ipcOn<Key extends keyof EventPayloadMapping>(

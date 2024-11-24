@@ -4,8 +4,13 @@ import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [appData, setAppData] = useState("");
 
   useEffect(() => {
+    window.electron.loadAppData().then((data) => {
+      setAppData(data);
+    });
+
     const unsub = window.electron.subscribeStatistics((statistics) =>
       console.log(statistics)
     );
@@ -24,7 +29,6 @@ function App() {
         <button
           onClick={() => {
             setCount((count) => count + 1);
-            window.electron.getStaticData().then((data) => console.log(data));
           }}
         >
           count is {count}
@@ -33,9 +37,7 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <p className="read-the-docs">APP DATA: {appData}</p>
     </>
   );
 }

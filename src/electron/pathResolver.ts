@@ -13,3 +13,11 @@ export function getPreloadPath() {
 export function getUIPath() {
   return path.join(app.getAppPath(), "/dist-react/index.html");
 }
+
+function getUsersHomePath() {
+  return app.getPath("home");
+}
+
+export function getDataPath() {
+  return path.join(getUsersHomePath(), ".sat-tracker", "data");
+}

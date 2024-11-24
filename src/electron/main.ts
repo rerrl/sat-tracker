@@ -1,7 +1,8 @@
 import { app, BrowserWindow } from "electron";
 import { ipcMainHandle, isDev } from "./util.js";
-import { getStaticData, pollResources } from "./resourceManager.js";
-import { getPreloadPath, getUIPath } from "./pathResolver.js";
+import { getStaticData, pollResources } from "./managers/resource.js";
+import { getDataPath, getPreloadPath, getUIPath } from "./pathResolver.js";
+import { loadAppData } from "./managers/data.js";
 
 app.on("ready", () => {
   const mainWindow = new BrowserWindow({
@@ -20,6 +21,14 @@ app.on("ready", () => {
   ipcMainHandle("getStaticData", () => {
     return getStaticData();
   });
+
+  ipcMainHandle("loadAppData", () => {
+    return loadAppData();
+  });
+
+  // ipcMainHandle("loadFile", (path: string) => {
+  //   return loadFile(path);
+  // });
 
   // start the electron services to keep the UI updated
   pollResources(mainWindow);

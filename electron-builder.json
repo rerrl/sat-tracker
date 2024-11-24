@@ -1,0 +1,16 @@
+{
+  "appId": "com.rerrl.electron",
+  "files": ["dist-electron", "dist-react"],
+  "icon": "./desktopIcon.png",
+  "mac": {
+    "target": "dmg",
+    "identity": null
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Utility"
+  },
+  "win": {
+    "target": ["portable", "msi"]
+  }
+}

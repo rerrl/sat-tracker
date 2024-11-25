@@ -10,7 +10,7 @@ app.on("ready", async () => {
       preload: getPreloadPath(),
     },
     width: 800,
-    height: 1000,
+    height: 700,
   });
 
   if (isDev()) {

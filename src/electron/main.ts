@@ -9,6 +9,8 @@ app.on("ready", () => {
     webPreferences: {
       preload: getPreloadPath(),
     },
+    width:800,
+    height:1000,
   });
 
   if (isDev()) {

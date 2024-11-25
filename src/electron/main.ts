@@ -28,6 +28,23 @@ app.on("ready", async () => {
     return DatabaseService.getBitcoinBuys();
   });
 
+  ipcMainHandle(
+    "saveBitcoinBuy",
+    (
+      date: Date,
+      amountPaidUsd: number,
+      amountReceivedSats: number,
+      memo: string
+    ) => {
+      return DatabaseService.saveBitcoinBuy(
+        date,
+        amountPaidUsd,
+        amountReceivedSats,
+        memo
+      );
+    }
+  );
+
   // ipcMainHandle("loadFile", (path: string) => {
   //   return loadFile(path);
   // });

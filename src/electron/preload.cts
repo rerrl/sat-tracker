@@ -9,7 +9,13 @@ electron.contextBridge.exposeInMainWorld("electron", {
   },
   getStaticData: () => ipcInvoke("getStaticData"),
   getBitcoinBuys: () => ipcInvoke("getBitcoinBuys"),
-  // loadFile: (path: string) => ipcInvoke("loadFile", path),
+  saveBitcoinBuy: (
+    date: Date,
+    amountPaidUsd: number,
+    amountReceivedSats: number,
+    memo: string | null
+  ) =>
+    ipcInvoke("saveBitcoinBuy", date, amountPaidUsd, amountReceivedSats, memo),
 } satisfies Window["electron"]);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

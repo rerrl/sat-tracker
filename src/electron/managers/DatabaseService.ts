@@ -19,7 +19,7 @@ class DatabaseService {
         console.error("Unable to connect to the database:", error);
       });
 
-    this.sequelize.define("BitcoinBuys", {
+    this.sequelize.define("BitcoinBuy", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -55,24 +55,33 @@ class DatabaseService {
     });
   }
 
-  // public async saveBitcoinBuy(): Promise<void> {
-  //   await this.awaitDatabaseReady();
-
-  //   this.sequelize.models.BitcoinBuys.create({
-  //     date: new Date(),
-  //     amountPaidUsd: 100,
-  //     amountReceivedSats: 100,
-  //     memo: "test",
-  //   });
-  // }
-
-  public async getBitcoinBuys(): Promise<BitcoinBuys[]> {
+  public async saveBitcoinBuy(
+    date: Date,
+    amountPaidUsd: number,
+    amountReceivedSats: number,
+    memo: string | null
+  ): Promise<BitcoinBuy> {
     await this.awaitDatabaseReady();
 
-    const buys = await this.sequelize.models.BitcoinBuys.findAll({
+    const latestBuy = await this.sequelize.models.BitcoinBuy.create({
+      date,
+      amountPaidUsd,
+      amountReceivedSats,
+      memo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return latestBuy.toJSON() as BitcoinBuy;
+  }
+
+  public async getBitcoinBuys(): Promise<BitcoinBuy[]> {
+    await this.awaitDatabaseReady();
+
+    const buys = await this.sequelize.models.BitcoinBuy.findAll({
       order: [["date", "DESC"]],
     });
-    return buys.map((buy) => buy.toJSON() as BitcoinBuys);
+    return buys.map((buy) => buy.toJSON() as BitcoinBuy);
   }
 
   private async awaitDatabaseReady(): Promise<void> {

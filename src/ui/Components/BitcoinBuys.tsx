@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { formatSats, formatUsd } from "../utils";
 
-const columnHelper = createColumnHelper<BitcoinBuys>();
+const columnHelper = createColumnHelper<BitcoinBuy>();
 
 const columns = [
   columnHelper.accessor("date", {
@@ -42,8 +42,8 @@ const columns = [
   },
 ];
 
-export default function EntriesList() {
-  const [data, setData] = useState<BitcoinBuys[]>([]);
+export default function BitcoinBuys() {
+  const [data, setData] = useState<BitcoinBuy[]>([]);
   const [isAddingBuy, setIsAddingBuy] = useState(false);
   const [buyDate, setBuyDate] = useState(new Date().toISOString());
   const [buyAmountUsd, setBuyAmountUsd] = useState(0);
@@ -62,13 +62,15 @@ export default function EntriesList() {
         alert("Please enter a valid amount");
         return;
       }
-      // Save the new buy
-      console.log("save clicked", {
-        buyAmountUsd,
-        buyAmountSats,
-        buyMemo,
-        buyDate,
-      });
+
+      window.electron
+        .saveBitcoinBuy(new Date(buyDate), buyAmountUsd, buyAmountSats, buyMemo)
+        .then((newBuy) => {
+          const newData = [...data, newBuy].sort(
+            (a, b) => b.date.getTime() - a.date.getTime()
+          );
+          setData(newData);
+        });
 
       // reset the form
       setBuyDate(new Date().toISOString().split("T")[0]);

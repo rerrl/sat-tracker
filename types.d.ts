@@ -12,15 +12,16 @@ type StaticData = {
 type EventPayloadMapping = {
   statistics: Statistics;
   getStaticData: StaticData;
-  getBitcoinBuys: BitcoinBuys[];
+  getBitcoinBuys: BitcoinBuy[];
+  saveBitcoinBuy: BitcoinBuy;
 };
 
-type BitcoinBuys = {
+type BitcoinBuy = {
   id: number;
   date: Date;
   amountPaidUsd: number;
   amountReceivedSats: number;
-  memo: string;
+  memo: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -33,6 +34,12 @@ interface Window {
       callback: (statistics: Statistics) => void
     ) => UnsubscribeFunction;
     getStaticData: () => Promise<StaticData>;
-    getBitcoinBuys: () => Promise<BitcoinBuys[]>;
+    getBitcoinBuys: () => Promise<BitcoinBuy[]>;
+    saveBitcoinBuy: (
+      date: Date,
+      amountPaidUsd: number,
+      amountReceivedSats: number,
+      memo: string | null
+    ) => Promise<BitcoinBuy>;
   };
 }

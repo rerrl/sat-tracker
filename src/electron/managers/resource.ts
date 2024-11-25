@@ -34,7 +34,7 @@ function getStorageData() {
   };
 }
 
-export function getStaticData() {
+export async function getStaticData() {
   const totalStorage = getStorageData().total;
   const cpuModel = os.cpus()[0].model;
   const totalMemoryGB = Math.floor(os.totalmem() / 1_000_000_000);

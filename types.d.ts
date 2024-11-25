@@ -12,11 +12,17 @@ type StaticData = {
 type EventPayloadMapping = {
   statistics: Statistics;
   getStaticData: StaticData;
-  loadAppData: string;
-  // loadFile: {
-  //   success: boolean;
-  //   data: string;
-  // };
+  getBitcoinBuys: BitcoinBuys[];
+};
+
+type BitcoinBuys = {
+  id: number;
+  date: Date;
+  amountPaidUsd: number;
+  amountReceivedSats: number;
+  memo: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 type UnsubscribeFunction = () => void;
@@ -27,10 +33,6 @@ interface Window {
       callback: (statistics: Statistics) => void
     ) => UnsubscribeFunction;
     getStaticData: () => Promise<StaticData>;
-    loadAppData: () => Promise<string>;
-    // loadFile: (path: string) => Promise<{
-    //   success: boolean;
-    //   data: string;
-    // }>;
+    getBitcoinBuys: () => Promise<BitcoinBuys[]>;
   };
 }

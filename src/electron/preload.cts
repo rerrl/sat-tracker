@@ -8,7 +8,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
     return ipcOn("statistics", (statistics) => callback(statistics));
   },
   getStaticData: () => ipcInvoke("getStaticData"),
-  loadAppData: () => ipcInvoke("loadAppData"),
+  getBitcoinBuys: () => ipcInvoke("getBitcoinBuys"),
   // loadFile: (path: string) => ipcInvoke("loadFile", path),
 } satisfies Window["electron"]);
 

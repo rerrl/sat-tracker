@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import BigNumber from "bignumber.js";
 import "../App.css";
 
 import {
@@ -9,46 +10,12 @@ import {
 } from "@tanstack/react-table";
 import { formatSats, formatUsd } from "../utils";
 
-type BitcoinBuyEvent = {
-  date: string;
-  amountPaidUsd: number;
-  amountReceivedSats: number;
-  averagePrice: number;
-};
-
-const defaultData: BitcoinBuyEvent[] = [
-  {
-    date: "2021-01-01",
-    amountPaidUsd: 1000,
-    amountReceivedSats: 100000,
-    averagePrice: 10000,
-  },
-  {
-    date: "2021-01-02",
-    amountPaidUsd: 2000,
-    amountReceivedSats: 200000,
-    averagePrice: 10000,
-  },
-  {
-    date: "2021-01-03",
-    amountPaidUsd: 3000,
-    amountReceivedSats: 300000,
-    averagePrice: 10000,
-  },
-  {
-    date: "2021-01-04",
-    amountPaidUsd: 4000,
-    amountReceivedSats: 400000,
-    averagePrice: 10000,
-  },
-];
-
-const columnHelper = createColumnHelper<BitcoinBuyEvent>();
+const columnHelper = createColumnHelper<BitcoinBuys>();
 
 const columns = [
   columnHelper.accessor("date", {
     header: () => "Date",
-    cell: (info) => info.cell.getValue(),
+    cell: (info) => info.cell.getValue().toISOString().split("T")[0],
   }),
   columnHelper.accessor("amountPaidUsd", {
     header: () => "USD Paid",
@@ -58,18 +25,27 @@ const columns = [
     header: () => "Sats Received",
     cell: (info) => formatSats(info.cell.getValue()),
   }),
-  columnHelper.accessor("averagePrice", {
-    header: () => "Average Price",
-    cell: (info) => formatUsd(info.cell.getValue()),
-  }),
+  {
+    id: "averagePrice",
+    header: () => "Average Price per BTC",
+    cell: ({ row }: { row: any }) => {
+      const amountPaidUsd = row.original.amountPaidUsd;
+      const amountReceivedSats = row.original.amountReceivedSats;
+      const amountReceivedBitcoin =
+        BigNumber(amountReceivedSats).dividedBy(100_000_000);
+      const averagePricePerBitcoin = BigNumber(amountPaidUsd).dividedBy(
+        amountReceivedBitcoin
+      );
+
+      return formatUsd(averagePricePerBitcoin.toNumber());
+    },
+  },
 ];
 
 export default function EntriesList() {
-  const [data, _setData] = useState(() => [...defaultData]);
+  const [data, setData] = useState<BitcoinBuys[]>([]);
   const [isAddingBuy, setIsAddingBuy] = useState(false);
-  const [buyDate, setBuyDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [buyDate, setBuyDate] = useState(new Date().toISOString());
   const [buyAmountUsd, setBuyAmountUsd] = useState(0);
   const [buyAmountSats, setBuyAmountSats] = useState(0);
   const [buyMemo, setBuyMemo] = useState<null | string>(null);
@@ -104,6 +80,12 @@ export default function EntriesList() {
     setIsAddingBuy(!isAddingBuy);
   };
 
+  useEffect(() => {
+    window.electron.getBitcoinBuys().then((data) => {
+      setData(data);
+    });
+  }, []);
+
   return (
     <>
       <div className="headline-row">
@@ -111,9 +93,19 @@ export default function EntriesList() {
           <p>Most Recent Buys</p>
         </div>
 
-        <button className="new-entry" onClick={handleAddBuyClick}>
-          {isAddingBuy ? "Save" : "Add Buy"}
-        </button>
+        <div className="recent-buys-buttons">
+          {isAddingBuy ? (
+            <button
+              className="new-entry"
+              onClick={() => setIsAddingBuy(!isAddingBuy)}
+            >
+              Cancel
+            </button>
+          ) : null}
+          <button className="new-entry" onClick={handleAddBuyClick}>
+            {isAddingBuy ? "Save" : "Add Buy"}
+          </button>
+        </div>
       </div>
 
       {isAddingBuy ? (

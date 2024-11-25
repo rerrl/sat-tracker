@@ -1,16 +1,16 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { ipcMainHandle, isDev } from "./util.js";
 import { getStaticData, pollResources } from "./managers/resource.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
-import { loadAppData } from "./managers/data.js";
+import DatabaseService from "./managers/DatabaseService.js";
 
-app.on("ready", () => {
+app.on("ready", async () => {
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
     },
-    width:800,
-    height:1000,
+    width: 800,
+    height: 1000,
   });
 
   if (isDev()) {
@@ -24,8 +24,8 @@ app.on("ready", () => {
     return getStaticData();
   });
 
-  ipcMainHandle("loadAppData", () => {
-    return loadAppData();
+  ipcMainHandle("getBitcoinBuys", () => {
+    return DatabaseService.getBitcoinBuys();
   });
 
   // ipcMainHandle("loadFile", (path: string) => {
@@ -33,5 +33,6 @@ app.on("ready", () => {
   // });
 
   // start the electron services to keep the UI updated
+  // DatabaseService.saveBitcoinBuy();
   pollResources(mainWindow);
 });

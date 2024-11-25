@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./App.css";
 import BitcoinBuys from "./Components/BitcoinBuys";
 import HeadlineMetrics from "./Components/HeadlineMetrics";
@@ -6,9 +6,6 @@ import Divider from "./Components/Divider";
 
 function App() {
   useEffect(() => {
-    // window.electron.loadAppData().then((data) => {
-    //   setAppData(data);
-    // });
     // const unsub = window.electron.subscribeStatistics((statistics) =>
     //   console.log(statistics)
     // );

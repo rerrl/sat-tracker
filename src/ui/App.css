@@ -138,3 +138,9 @@
   border-bottom: 1px solid #ccc;
   margin-top: 50px;
 }
+
+.recent-buys-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}

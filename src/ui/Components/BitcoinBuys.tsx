@@ -49,10 +49,10 @@ export default function BitcoinBuys({
 }) {
   const [data, setData] = useState<BitcoinBuy[]>([]);
   const [isAddingBuy, setIsAddingBuy] = useState(false);
-  const [buyDate, setBuyDate] = useState(new Date().toISOString());
   const [buyAmountUsd, setBuyAmountUsd] = useState(0);
   const [buyAmountSats, setBuyAmountSats] = useState(0);
   const [buyMemo, setBuyMemo] = useState<null | string>(null);
+  const [buyDate, setBuyDate] = useState<Date>(new Date());
 
   const table = useReactTable({
     data,
@@ -60,15 +60,33 @@ export default function BitcoinBuys({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const getLocaleDateString = (date: Date) => {
+    const localeDate = buyDate.toLocaleDateString().split("/").join("-");
+    const [month, day, year] = localeDate.split("-");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getLocalTimeString = (date: Date) => {
+    // get local time in 24 hour format
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedHours = hours < 10 ? `0${hours}` : hours;
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${formattedHours}:${formattedMinutes}`;
+  };
+
   const handleAddBuyClick = async () => {
     if (isAddingBuy) {
-      if (buyAmountUsd === 0 || buyAmountSats === 0 || buyDate === "") {
+      if (buyAmountUsd === 0 || buyAmountSats === 0 || !buyDate) {
         alert("Please enter a valid amount");
         return;
       }
 
+      // save the buy
       const newBuy = await window.electron.saveBitcoinBuy(
-        new Date(buyDate),
+        buyDate,
         buyAmountUsd,
         buyAmountSats,
         buyMemo
@@ -79,9 +97,8 @@ export default function BitcoinBuys({
       );
       setData(newData);
       onTableUpdate();
-
-      // reset the form
-      setBuyDate(new Date().toISOString().split("T")[0]);
+    } else {
+      setBuyDate(new Date());
       setBuyAmountUsd(0);
       setBuyAmountSats(0);
       setBuyMemo(null);
@@ -122,14 +139,6 @@ export default function BitcoinBuys({
         <>
           <div className="row">
             <div className="metric-item">
-              <p>Date</p>
-              <input
-                type="date"
-                defaultValue={new Date().toISOString().split("T")[0]}
-                onChange={(e) => setBuyDate(e.target.value)}
-              />
-            </div>
-            <div className="metric-item">
               <p>USD Spent</p>
               <input
                 type="number"
@@ -145,6 +154,18 @@ export default function BitcoinBuys({
             </div>
           </div>
           <div className="row">
+            <div className="metric-item">
+              <p>Date</p>
+              <input
+                type="datetime-local"
+                value={`${getLocaleDateString(buyDate)}T${getLocalTimeString(
+                  buyDate
+                )}`}
+                onChange={(e) => {
+                  setBuyDate(new Date(e.target.value));
+                }}
+              />
+            </div>
             <div className="metric-item">
               <p>Memo (optional)</p>
               <input type="text" onChange={(e) => setBuyMemo(e.target.value)} />

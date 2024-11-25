@@ -1,21 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatSats, formatUsd } from "../utils";
 
-export default function HeadlineMetrics() {
-  const [topStats, setTopStats] = useState({
-    totalReturn: 205012,
-    totalSats: 213541001154,
-    valueUSD: 205015.51,
-    averageEntry: 52152,
-    totalInvested: 100000,
+export default function HeadlineMetrics({
+  triggerRefresh,
+}: {
+  triggerRefresh: boolean;
+}) {
+  const [topStats, setTopStats] = useState<HeadlineStats>({
+    bitcoinPrice: 0,
+    totalReturn: 0,
+    totalSats: 0,
+    valueUsd: 0,
+    averageEntry: 0,
+    totalInvested: 0,
   });
+
+  useEffect(() => {
+    window.electron.getHeadlineStats().then(setTopStats);
+  }, [triggerRefresh]);
 
   return (
     <div>
       <div className="row">
         <div className="metric-item">
           <p>Bitcoin Price</p>
-          <input type="number" defaultValue={97824} />
+          <p>{formatUsd(topStats.bitcoinPrice)}</p>
         </div>
         <div className="metric-item">
           <p>Total Return</p>
@@ -30,7 +39,7 @@ export default function HeadlineMetrics() {
       <div className="row">
         <div className="metric-item">
           <p>Value USD</p>
-          <p>{formatUsd(topStats.valueUSD)}</p>
+          <p>{formatUsd(topStats.valueUsd)}</p>
         </div>
         <div className="metric-item">
           <p>Average Entry</p>

@@ -14,6 +14,7 @@ type EventPayloadMapping = {
   getStaticData: StaticData;
   getBitcoinBuys: BitcoinBuy[];
   saveBitcoinBuy: BitcoinBuy;
+  getHeadlineStats: HeadlineStats;
 };
 
 type BitcoinBuy = {
@@ -24,6 +25,15 @@ type BitcoinBuy = {
   memo: string | null;
   createdAt: Date;
   updatedAt: Date;
+};
+
+type HeadlineStats = {
+  bitcoinPrice: number;
+  totalReturn: number;
+  totalSats: number;
+  valueUsd: number;
+  averageEntry: number;
+  totalInvested: number;
 };
 
 type UnsubscribeFunction = () => void;
@@ -41,5 +51,6 @@ interface Window {
       amountReceivedSats: number,
       memo: string | null
     ) => Promise<BitcoinBuy>;
+    getHeadlineStats: () => Promise<HeadlineStats>;
   };
 }

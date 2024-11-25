@@ -1,9 +1,11 @@
+import { BigNumber } from "bignumber.js";
 import { getAppDataFolder } from "../pathResolver.js";
 import { Sequelize, DataTypes } from "sequelize";
 
 class DatabaseService {
   private sequelize: Sequelize;
   private databaseReady: boolean = false;
+  private bitcoinPrice = 0;
 
   constructor() {
     this.sequelize = new Sequelize({
@@ -82,6 +84,45 @@ class DatabaseService {
       order: [["date", "DESC"]],
     });
     return buys.map((buy) => buy.toJSON() as BitcoinBuy);
+  }
+
+  public async getHeadlineStats(): Promise<HeadlineStats> {
+    await this.awaitDatabaseReady();
+
+    if (this.bitcoinPrice === 0) {
+      const bitcoinPriceResponse = await fetch(
+        "https://api.coindesk.com/v1/bpi/currentprice.json"
+      );
+
+      this.bitcoinPrice = (
+        await bitcoinPriceResponse.json()
+      ).bpi.USD.rate_float;
+    }
+
+    const totalInvested =
+      (await this.sequelize.models.BitcoinBuy.sum("amountPaidUsd")) || 0;
+
+    const totalSats =
+      (await this.sequelize.models.BitcoinBuy.sum("amountReceivedSats")) || 0;
+
+    const valueUsd = (totalSats / 100000000) * this.bitcoinPrice;
+
+    const totalReturn = valueUsd - totalInvested;
+
+    const averageEntry =
+      BigNumber(totalInvested)
+        .div(totalSats)
+        .multipliedBy(100000000)
+        .toNumber() || 0;
+
+    return {
+      bitcoinPrice: this.bitcoinPrice,
+      totalReturn,
+      totalSats,
+      valueUsd,
+      averageEntry,
+      totalInvested,
+    };
   }
 
   private async awaitDatabaseReady(): Promise<void> {

@@ -16,6 +16,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
     memo: string | null
   ) =>
     ipcInvoke("saveBitcoinBuy", date, amountPaidUsd, amountReceivedSats, memo),
+  getHeadlineStats: () => ipcInvoke("getHeadlineStats"),
 } satisfies Window["electron"]);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

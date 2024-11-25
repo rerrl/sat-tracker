@@ -42,7 +42,11 @@ const columns = [
   },
 ];
 
-export default function BitcoinBuys() {
+export default function BitcoinBuys({
+  onTableUpdate,
+}: {
+  onTableUpdate: () => void;
+}) {
   const [data, setData] = useState<BitcoinBuy[]>([]);
   const [isAddingBuy, setIsAddingBuy] = useState(false);
   const [buyDate, setBuyDate] = useState(new Date().toISOString());
@@ -56,21 +60,25 @@ export default function BitcoinBuys() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const handleAddBuyClick = () => {
+  const handleAddBuyClick = async () => {
     if (isAddingBuy) {
       if (buyAmountUsd === 0 || buyAmountSats === 0 || buyDate === "") {
         alert("Please enter a valid amount");
         return;
       }
 
-      window.electron
-        .saveBitcoinBuy(new Date(buyDate), buyAmountUsd, buyAmountSats, buyMemo)
-        .then((newBuy) => {
-          const newData = [...data, newBuy].sort(
-            (a, b) => b.date.getTime() - a.date.getTime()
-          );
-          setData(newData);
-        });
+      const newBuy = await window.electron.saveBitcoinBuy(
+        new Date(buyDate),
+        buyAmountUsd,
+        buyAmountSats,
+        buyMemo
+      );
+
+      const newData = [...data, newBuy].sort(
+        (a, b) => b.date.getTime() - a.date.getTime()
+      );
+      setData(newData);
+      onTableUpdate();
 
       // reset the form
       setBuyDate(new Date().toISOString().split("T")[0]);

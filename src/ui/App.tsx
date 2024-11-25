@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import BitcoinBuys from "./Components/BitcoinBuys";
 import HeadlineMetrics from "./Components/HeadlineMetrics";
 import Divider from "./Components/Divider";
 
 function App() {
+  const [triggerRefresh, setTriggerRefresh] = useState(false);
+
   useEffect(() => {
     // const unsub = window.electron.subscribeStatistics((statistics) =>
     //   console.log(statistics)
@@ -15,9 +17,9 @@ function App() {
   return (
     <div className="container">
       <h1>Sat Tracker</h1>
-      <HeadlineMetrics />
+      <HeadlineMetrics triggerRefresh={triggerRefresh} />
       <Divider />
-      <BitcoinBuys />
+      <BitcoinBuys onTableUpdate={() => setTriggerRefresh(!triggerRefresh)} />
     </div>
   );
 }

@@ -45,11 +45,15 @@ app.on("ready", async () => {
     }
   );
 
+  ipcMainHandle("getHeadlineStats", () => {
+    return DatabaseService.getHeadlineStats();
+  });
+
   // ipcMainHandle("loadFile", (path: string) => {
   //   return loadFile(path);
   // });
 
   // start the electron services to keep the UI updated
-  // DatabaseService.saveBitcoinBuy();
-  pollResources(mainWindow);
+
+  // pollResources(mainWindow);
 });

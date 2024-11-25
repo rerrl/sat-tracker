@@ -15,6 +15,7 @@ type EventPayloadMapping = {
   getBitcoinBuys: BitcoinBuy[];
   saveBitcoinBuy: BitcoinBuy;
   getHeadlineStats: HeadlineStats;
+  deleteBitcoinBuy: void;
 };
 
 type BitcoinBuy = {
@@ -52,5 +53,6 @@ interface Window {
       memo: string | null
     ) => Promise<BitcoinBuy>;
     getHeadlineStats: () => Promise<HeadlineStats>;
+    deleteBitcoinBuy: (id: number) => Promise<void>;
   };
 }

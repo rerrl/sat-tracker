@@ -10,38 +10,6 @@ import {
 } from "@tanstack/react-table";
 import { formatSats, formatUsd } from "../utils";
 
-const columnHelper = createColumnHelper<BitcoinBuy>();
-
-const columns = [
-  columnHelper.accessor("date", {
-    header: () => "Date",
-    cell: (info) => info.cell.getValue().toISOString().split("T")[0],
-  }),
-  columnHelper.accessor("amountPaidUsd", {
-    header: () => "USD Paid",
-    cell: (info) => formatUsd(info.cell.getValue()),
-  }),
-  columnHelper.accessor("amountReceivedSats", {
-    header: () => "Sats Received",
-    cell: (info) => formatSats(info.cell.getValue()),
-  }),
-  {
-    id: "averagePrice",
-    header: () => "Average Price per BTC",
-    cell: ({ row }: { row: any }) => {
-      const amountPaidUsd = row.original.amountPaidUsd;
-      const amountReceivedSats = row.original.amountReceivedSats;
-      const amountReceivedBitcoin =
-        BigNumber(amountReceivedSats).dividedBy(100_000_000);
-      const averagePricePerBitcoin = BigNumber(amountPaidUsd).dividedBy(
-        amountReceivedBitcoin
-      );
-
-      return formatUsd(averagePricePerBitcoin.toNumber());
-    },
-  },
-];
-
 export default function BitcoinBuys({
   onTableUpdate,
 }: {
@@ -53,6 +21,64 @@ export default function BitcoinBuys({
   const [buyAmountSats, setBuyAmountSats] = useState(0);
   const [buyMemo, setBuyMemo] = useState<null | string>(null);
   const [buyDate, setBuyDate] = useState<Date>(new Date());
+  const [editId, setEditId] = useState<null | number>(null);
+
+  const columnHelper = createColumnHelper<BitcoinBuy>();
+
+  const columns = [
+    columnHelper.accessor("date", {
+      header: () => "Date",
+      cell: (info) => info.cell.getValue().toISOString().split("T")[0],
+    }),
+    columnHelper.accessor("amountPaidUsd", {
+      header: () => "USD Paid",
+      cell: (info) => formatUsd(info.cell.getValue()),
+    }),
+    columnHelper.accessor("amountReceivedSats", {
+      header: () => "Sats Received",
+      cell: (info) => formatSats(info.cell.getValue()),
+    }),
+    {
+      id: "averagePrice",
+      header: () => "Average Price per BTC",
+      cell: ({ row }: { row: any }) => {
+        const amountPaidUsd = row.original.amountPaidUsd;
+        const amountReceivedSats = row.original.amountReceivedSats;
+        const amountReceivedBitcoin =
+          BigNumber(amountReceivedSats).dividedBy(100_000_000);
+        const averagePricePerBitcoin = BigNumber(amountPaidUsd).dividedBy(
+          amountReceivedBitcoin
+        );
+
+        return formatUsd(averagePricePerBitcoin.toNumber());
+      },
+    },
+    {
+      id: "delete",
+      header: () => "Edit",
+      cell: ({ row }: { row: any }) => {
+        return (
+          <button
+            className={editId === row.original.id ? "negative" : ""}
+            onClick={async () => {
+              if (editId === row.original.id) {
+                await window.electron.deleteBitcoinBuy(row.original.id);
+                const newData = data.filter(
+                  (buy) => buy.id !== row.original.id
+                );
+                setData(newData);
+                onTableUpdate();
+              }
+
+              setEditId(row.original.id);
+            }}
+          >
+            {editId === row.original.id ? "Del" : "Edit"}
+          </button>
+        );
+      },
+    },
+  ];
 
   const table = useReactTable({
     data,
@@ -112,6 +138,15 @@ export default function BitcoinBuys({
       setData(data);
     });
   }, []);
+
+  // only keep editId in state for 3 seconds
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setEditId(null);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [editId]);
 
   return (
     <>
@@ -193,7 +228,10 @@ export default function BitcoinBuys({
             </thead>
             <tbody>
               {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
+                <tr
+                  className={editId === row.original.id ? "neutral-blue" : ""}
+                  key={row.id}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id}>
                       {flexRender(

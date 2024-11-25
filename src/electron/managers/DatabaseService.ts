@@ -125,6 +125,16 @@ class DatabaseService {
     };
   }
 
+  public async deleteBitcoinBuy(id: number): Promise<void> {
+    await this.awaitDatabaseReady();
+
+    await this.sequelize.models.BitcoinBuy.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+
   private async awaitDatabaseReady(): Promise<void> {
     while (!this.databaseReady) {
       await new Promise((resolve) => setTimeout(resolve, 1000));

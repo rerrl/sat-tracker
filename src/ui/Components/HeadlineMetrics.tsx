@@ -58,15 +58,17 @@ export default function HeadlineMetrics({
           <p className="metric-title">Total Return</p>
           <p>{formatUsd(topStats.totalReturn)}</p>
           <p>
-            {isInTheMoney ? "+" : ""}
-            {dropDecimal(
-              addCommas(
-                BigNumber(topStats.totalReturn)
-                  .dividedBy(topStats.totalInvested)
-                  .times(100)
-                  .toFixed(0)
-              )
-            ) + " "}
+            {isInTheMoney && topStats.totalInvested !== 0 ? "+" : ""}
+            {topStats.totalInvested === 0
+              ? "0"
+              : dropDecimal(
+                  addCommas(
+                    BigNumber(topStats.totalReturn)
+                      .dividedBy(topStats.totalInvested)
+                      .times(100)
+                      .toFixed(0)
+                  )
+                ) + " "}
             %
           </p>
         </div>

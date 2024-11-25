@@ -49,6 +49,10 @@ app.on("ready", async () => {
     return DatabaseService.getHeadlineStats();
   });
 
+  ipcMainHandle("deleteBitcoinBuy", (id: number) => {
+    return DatabaseService.deleteBitcoinBuy(id);
+  });
+
   // ipcMainHandle("loadFile", (path: string) => {
   //   return loadFile(path);
   // });

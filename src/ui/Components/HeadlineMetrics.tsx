@@ -3,7 +3,6 @@ import { formatSats, formatUsd } from "../utils";
 
 export default function HeadlineMetrics() {
   const [topStats, setTopStats] = useState({
-    bitcoinPrice: 97824,
     totalReturn: 205012,
     totalSats: 213541001154,
     valueUSD: 205015.51,
@@ -16,7 +15,7 @@ export default function HeadlineMetrics() {
       <div className="row">
         <div className="metric-item">
           <p>Bitcoin Price</p>
-          <p>{formatUsd(topStats.bitcoinPrice)}</p>
+          <input type="number" defaultValue={97824} />
         </div>
         <div className="metric-item">
           <p>Total Return</p>

@@ -11,6 +11,7 @@ type StaticData = {
 
 type EventPayloadMapping = {
   statistics: Statistics;
+  csvImported: void;
   getStaticData: StaticData;
   getBitcoinBuys: BitcoinBuy[];
   saveBitcoinBuy: BitcoinBuy;
@@ -41,9 +42,16 @@ type UnsubscribeFunction = () => void;
 
 interface Window {
   electron: {
+    // functions to subscribe to events from backend
     subscribeStatistics: (
       callback: (statistics: Statistics) => void
     ) => UnsubscribeFunction;
+
+    subscribeCsvImported: (
+      callback: () => void
+    ) => UnsubscribeFunction;
+
+    // functions to call backend functions
     getStaticData: () => Promise<StaticData>;
     getBitcoinBuys: () => Promise<BitcoinBuy[]>;
     saveBitcoinBuy: (

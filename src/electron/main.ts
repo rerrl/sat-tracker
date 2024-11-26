@@ -6,21 +6,6 @@ import DatabaseService from "./services/DatabaseService.js";
 import FileService from "./services/FileService.js";
 
 app.on("ready", async () => {
-  const template = [
-    {
-      label: "File",
-      submenu: [
-        {
-          label: "Import Coinbase Buys from CSV",
-          click: async () => {
-            await FileService.importCSV();
-          },
-        },
-      ],
-    },
-  ];
-
-  const menu = Menu.buildFromTemplate(template)
 
   const mainWindow = new BrowserWindow({
     webPreferences: {
@@ -29,6 +14,23 @@ app.on("ready", async () => {
     width: 800,
     height: 700,
   });
+
+  const template = [
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "Import Coinbase Buys from CSV",
+          click: async () => {
+            await FileService.importCSV(mainWindow);
+
+          },
+        },
+      ],
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template)
 
   mainWindow.setMenu(menu);
 

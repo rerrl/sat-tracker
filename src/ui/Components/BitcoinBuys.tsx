@@ -137,6 +137,15 @@ export default function BitcoinBuys({
     window.electron.getBitcoinBuys().then((data) => {
       setData(data);
     });
+
+    const unsub = window.electron.subscribeCsvImported(() => {
+      window.electron.getBitcoinBuys().then((data) => {
+        setData(data);
+        onTableUpdate();
+      });
+    });
+
+    return unsub;
   }, []);
 
   // only keep editId in state for 3 seconds

@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Papa from "papaparse";
 import fs from "fs";
-import { dialog } from "electron";
+import { BrowserWindow, dialog } from "electron";
 import { BigNumber } from "bignumber.js";
 import DatabaseService from "./DatabaseService.js";
+import { ipcWebContentsSend } from "../util.js";
 
 
 class FileService {
@@ -99,11 +100,11 @@ class FileService {
                 groupedBuys[workingTimestamp.toISOString()] = [];
             }
 
-            const isWithinFiveSeconds = (timestamp: Date, workingTimestamp: Date) => {
-                return Math.abs(timestamp.getTime() - workingTimestamp.getTime()) < 60000;
+            const isWithinNumberOfMs = (timestamp: Date, workingTimestamp: Date, withinMs: number) => {
+                return Math.abs(timestamp.getTime() - workingTimestamp.getTime()) < withinMs;
             }
 
-            if (isWithinFiveSeconds(timestamp, workingTimestamp)) {
+            if (isWithinNumberOfMs(timestamp, workingTimestamp, 60000)) {
                 groupedBuys[workingTimestamp.toISOString()].push({
                     timestamp,
                     totalPaidInUSD,
@@ -135,7 +136,7 @@ class FileService {
         });
     }
 
-    public importCSV = async () => {
+    public importCSV = async (mainWindow: BrowserWindow) => {
         const filesToImport = await this.promptForFile("Import CSV", "csv");
 
         if (filesToImport.length === 0) {
@@ -155,9 +156,10 @@ class FileService {
 
         if (importType === 'coinbase') {
             console.log('Coinbase CSV detected');
-            return await this.importCoinbaseBuysCsv(parsed);
+            await this.importCoinbaseBuysCsv(parsed);
         }
 
+        ipcWebContentsSend("csvImported", mainWindow.webContents, void 0);
     }
 }
 

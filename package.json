@@ -20,6 +20,7 @@
     "@tanstack/react-table": "^8.20.5",
     "bignumber.js": "^9.1.2",
     "os-utils": "^0.0.14",
+    "papaparse": "^5.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sequelize": "^6.37.5",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@types/os-utils": "^0.0.4",
+    "@types/papaparse": "^5.3.15",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",

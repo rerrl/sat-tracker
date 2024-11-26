@@ -3,7 +3,7 @@ import { ipcMainHandle, isDev } from "./util.js";
 import { getStaticData } from "./services/resource.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import DatabaseService from "./services/DatabaseService.js";
-import SystemService from "./services/SystemService.js";
+import FileService from "./services/FileService.js";
 
 app.on("ready", async () => {
   const template = [
@@ -11,10 +11,9 @@ app.on("ready", async () => {
       label: "File",
       submenu: [
         {
-          label: "Import CSV",
+          label: "Import Coinbase Buys from CSV",
           click: async () => {
-            const filesToImport = await SystemService.promptForFile("Import CSV", "csv");
-            console.log({ filesToImport });
+            await FileService.importCSV();
           },
         },
       ],

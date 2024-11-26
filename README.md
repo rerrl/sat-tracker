@@ -14,10 +14,11 @@ NOTE: As this project currently stands, it does not track sales of bitcoin. This
 - All data is stored locally on your machine in a hidden folder under `$HOME` called `sat-tracker`
 
 Planned features:
-[] toggle between sats and BTC
-[] obfuscate portfolio value
-[] Sat Trader section to easily track Sat-denominated trades and track their performance against BTC
-[] import from other exchanges
+
+- [ ] toggle between sats and BTC
+- [ ] obfuscate portfolio value
+- [ ] Sat Trader section to easily track Sat-denominated trades and track their performance against BTC
+- [ ] import from other exchanges
 
 ## Contribute
 

@@ -64,6 +64,15 @@ class FileService {
 
 
 
+        let workingTimestamp: Date;
+
+        const groupedBuys: {
+            [key: string]: {
+                timestamp: Date,
+                totalPaidInUSD: string,
+                totalBitcoinBought: string
+            }[]
+        } = {};
 
         const dataToImport = data.filter((row: any) => row.length >= 5)
         dataToImport.forEach(async (row: any) => {
@@ -85,10 +94,42 @@ class FileService {
                 return;
             }
 
+            if (!workingTimestamp) {
+                workingTimestamp = timestamp;
+                groupedBuys[workingTimestamp.toISOString()] = [];
+            }
+
+            const isWithinFiveSeconds = (timestamp: Date, workingTimestamp: Date) => {
+                return Math.abs(timestamp.getTime() - workingTimestamp.getTime()) < 60000;
+            }
+
+            if (isWithinFiveSeconds(timestamp, workingTimestamp)) {
+                groupedBuys[workingTimestamp.toISOString()].push({
+                    timestamp,
+                    totalPaidInUSD,
+                    totalBitcoinBought
+                });
+            } else {
+                workingTimestamp = timestamp;
+                groupedBuys[workingTimestamp.toISOString()] = [{
+                    timestamp,
+                    totalPaidInUSD,
+                    totalBitcoinBought
+                }];
+            }
+        });
+
+        // import grouped buys as a single transaction
+        Object.keys(groupedBuys).forEach(async (key) => {
+            const buys = groupedBuys[key];
+            const timestamp = buys[0].timestamp;
+            const totalPaidInUSD = buys.reduce((acc, buy) => acc + parseFloat(buy.totalPaidInUSD), 0);
+            const totalBitcoinBought = buys.reduce((acc, buy) => acc + parseFloat(buy.totalBitcoinBought), 0);
+
             await DatabaseService.saveBitcoinBuy(
                 new Date(timestamp),
                 new BigNumber(totalPaidInUSD).toNumber(),
-                new BigNumber(totalBitcoinBought).multipliedBy(100000000).toNumber(),
+                new BigNumber(totalBitcoinBought).multipliedBy(100000000).integerValue(BigNumber.ROUND_DOWN).toNumber(),
                 null
             );
         });

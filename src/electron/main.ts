@@ -1,10 +1,27 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import { ipcMainHandle, isDev } from "./util.js";
-import { getStaticData, pollResources } from "./managers/resource.js";
+import { getStaticData, promptForFile, } from "./managers/resource.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import DatabaseService from "./managers/DatabaseService.js";
 
 app.on("ready", async () => {
+  const template = [
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "Import CSV",
+          click: async () => {
+            const filesToImport = await promptForFile();
+            console.log({ filesToImport });
+          },
+        },
+      ],
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template)
+
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
@@ -12,6 +29,8 @@ app.on("ready", async () => {
     width: 800,
     height: 700,
   });
+
+  mainWindow.setMenu(menu);
 
   if (isDev()) {
     mainWindow.loadURL("http://localhost:5123");
@@ -53,11 +72,12 @@ app.on("ready", async () => {
     return DatabaseService.deleteBitcoinBuy(id);
   });
 
-  // ipcMainHandle("loadFile", (path: string) => {
-  //   return loadFile(path);
-  // });
+  ipcMainHandle("importBitcoinBuysCSV", async () => {
+    const filesToImport = await promptForFile();
+    console.log({ filesToImport });
+    return filesToImport;
+  })
 
   // start the electron services to keep the UI updated
-
   // pollResources(mainWindow);
 });

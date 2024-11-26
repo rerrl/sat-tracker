@@ -16,6 +16,7 @@ type EventPayloadMapping = {
   saveBitcoinBuy: BitcoinBuy;
   getHeadlineStats: HeadlineStats;
   deleteBitcoinBuy: void;
+  importBitcoinBuysCSV: string[];
 };
 
 type BitcoinBuy = {
@@ -54,5 +55,6 @@ interface Window {
     ) => Promise<BitcoinBuy>;
     getHeadlineStats: () => Promise<HeadlineStats>;
     deleteBitcoinBuy: (id: number) => Promise<void>;
+    importBitcoinBuysCSV: () => Promise<string[]>;
   };
 }

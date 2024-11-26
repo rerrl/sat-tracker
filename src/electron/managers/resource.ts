@@ -1,7 +1,7 @@
 import osUtils from "os-utils";
 import fs from "fs";
 import os from "os";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, dialog } from "electron";
 import { ipcWebContentsSend } from "../util.js";
 
 const POLLING_INTERVAL = 500;
@@ -44,4 +44,16 @@ export async function getStaticData() {
     cpuModel,
     totalMemoryGB,
   };
+}
+
+export async function promptForFile() {
+  return new Promise<string[]>((resolve) => {
+    dialog.showOpenDialog({
+      title: "Select CSV file to import",
+      properties: ["openFile"],
+      filters: [{ name: "CSV Files", extensions: ["csv"] }],
+    }).then((result) => {
+      resolve(result.filePaths);
+    });
+  });
 }

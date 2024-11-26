@@ -41,7 +41,7 @@ export default function BitcoinBuys({
     {
       id: "averagePrice",
       header: () => "Average Price per BTC",
-      cell: ({ row }: { row: any }) => {
+      cell: ({ row }: { row: { original: BitcoinBuy } }) => {
         const amountPaidUsd = row.original.amountPaidUsd;
         const amountReceivedSats = row.original.amountReceivedSats;
         const amountReceivedBitcoin =
@@ -56,7 +56,7 @@ export default function BitcoinBuys({
     {
       id: "delete",
       header: () => "Edit",
-      cell: ({ row }: { row: any }) => {
+      cell: ({ row }: { row: { original: BitcoinBuy } }) => {
         return (
           <button
             className={editId === row.original.id ? "negative" : ""}
@@ -86,7 +86,7 @@ export default function BitcoinBuys({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const getLocaleDateString = (date: Date) => {
+  const getLocaleDateString = (buyDate: Date) => {
     const localeDate = buyDate.toLocaleDateString().split("/").join("-");
     const [month, day, year] = localeDate.split("-");
 

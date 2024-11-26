@@ -1,8 +1,9 @@
 import { app, BrowserWindow, Menu } from "electron";
 import { ipcMainHandle, isDev } from "./util.js";
-import { getStaticData, promptForFile, } from "./managers/resource.js";
+import { getStaticData } from "./services/resource.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
-import DatabaseService from "./managers/DatabaseService.js";
+import DatabaseService from "./services/DatabaseService.js";
+import SystemService from "./services/SystemService.js";
 
 app.on("ready", async () => {
   const template = [
@@ -12,7 +13,7 @@ app.on("ready", async () => {
         {
           label: "Import CSV",
           click: async () => {
-            const filesToImport = await promptForFile();
+            const filesToImport = await SystemService.promptForFile("Import CSV", "csv");
             console.log({ filesToImport });
           },
         },
@@ -71,12 +72,6 @@ app.on("ready", async () => {
   ipcMainHandle("deleteBitcoinBuy", (id: number) => {
     return DatabaseService.deleteBitcoinBuy(id);
   });
-
-  ipcMainHandle("importBitcoinBuysCSV", async () => {
-    const filesToImport = await promptForFile();
-    console.log({ filesToImport });
-    return filesToImport;
-  })
 
   // start the electron services to keep the UI updated
   // pollResources(mainWindow);

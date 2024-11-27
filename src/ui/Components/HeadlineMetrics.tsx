@@ -4,8 +4,10 @@ import BigNumber from "bignumber.js";
 
 export default function HeadlineMetrics({
   triggerRefresh,
+  hideBalances,
 }: {
   triggerRefresh: boolean;
+  hideBalances: boolean;
 }) {
   const [topStats, setTopStats] = useState<HeadlineStats>({
     bitcoinPrice: 0,
@@ -33,33 +35,33 @@ export default function HeadlineMetrics({
           className={`metric-item ${isInTheMoney ? "positive" : "negative"}`}
         >
           <p className="metric-title">Value USD</p>
-          <p>{formatUsd(topStats.valueUsd)}</p>
+          <p>{formatUsd(hideBalances ? 0 : topStats.valueUsd)}</p>
         </div>
         <div className="metric-item bitcoin">
           <p className="metric-title">Total Sats</p>
-          <p>{formatSats(topStats.totalSats)}</p>
+          <p>{formatSats(hideBalances ? 0 : topStats.totalSats)}</p>
         </div>
       </div>
 
       <div className="row">
         <div className="metric-item neutral-blue">
           <p className="metric-title">Average Entry</p>
-          <p>{formatUsd(topStats.averageEntry)}</p>
+          <p>{formatUsd(hideBalances ? 0 : topStats.averageEntry)}</p>
         </div>
         <div
           className={`metric-item ${isInTheMoney ? "positive" : "negative"}`}
         >
           <p className="metric-title">Total Invested</p>
-          <p>{formatUsd(topStats.totalInvested)}</p>
+          <p>{formatUsd(hideBalances ? 0 : topStats.totalInvested)}</p>
         </div>
         <div
           className={`metric-item ${isInTheMoney ? "positive" : "negative"}`}
         >
           <p className="metric-title">Total Return</p>
-          <p>{formatUsd(topStats.totalReturn)}</p>
+          <p>{formatUsd(hideBalances ? 0 : topStats.totalReturn)}</p>
           <p>
             {isInTheMoney && topStats.totalInvested !== 0 ? "+" : ""}
-            {topStats.totalInvested === 0
+            {topStats.totalInvested === 0 || hideBalances
               ? "0"
               : dropDecimal(
                   addCommas(

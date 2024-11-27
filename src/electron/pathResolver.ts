@@ -19,5 +19,7 @@ function getUsersHomePath() {
 }
 
 export function getAppDataFolder() {
-  return path.join(getUsersHomePath(), ".sat-tracker");
+  const appDataPath = path.join(getUsersHomePath(), ".sat-tracker");
+  const devDataPath = path.join(appDataPath, "dev");
+  return isDev() ? devDataPath : appDataPath;
 }

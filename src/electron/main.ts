@@ -12,7 +12,7 @@ app.on("ready", async () => {
       preload: getPreloadPath(),
     },
     width: 800,
-    height: 700,
+    height: 860,
   });
 
   const template = [

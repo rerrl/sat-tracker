@@ -41,7 +41,7 @@
   min-width: 320px;
   min-height: 100vh;
   /* width: 190px; */
-  background-color: #0f0f0f;
+  /* background-color: #0f0f0f; */
 }
 
 .row {
@@ -158,6 +158,7 @@
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  gap: 10px;
 }
 
 .positive {
@@ -178,4 +179,19 @@
 .neutral-blue {
   color: #61dafb;
   border-color: #61dafb;
+}
+
+.title-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eye-logos {
+  display: flex;
+  font-size: xx-large;
+}
+
+.clickable {
+  cursor: pointer;
 }

@@ -11,8 +11,10 @@ import {
 import { formatSats, formatUsd } from "../utils";
 
 export default function BitcoinBuys({
+  hideBalances,
   onTableUpdate,
 }: {
+  hideBalances: boolean;
   onTableUpdate: () => void;
 }) {
   const [data, setData] = useState<BitcoinBuy[]>([]);
@@ -161,7 +163,7 @@ export default function BitcoinBuys({
     <>
       <div className="headline-row">
         <div className="latest-entries-title">
-          <p>Most Recent Buys</p>
+          <p>{isAddingBuy ? "Add Buy Event" : "Most Recent Buys"}</p>
         </div>
 
         <div className="recent-buys-buttons">
@@ -244,7 +246,7 @@ export default function BitcoinBuys({
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id}>
                       {flexRender(
-                        cell.column.columnDef.cell,
+                        hideBalances ? "-" : cell.column.columnDef.cell,
                         cell.getContext()
                       )}
                     </td>

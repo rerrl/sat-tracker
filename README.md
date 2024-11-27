@@ -14,6 +14,8 @@ The idea is to have a place to keep track of your bitcoin balance. I use this by
 - All data is stored locally on your machine in a hidden folder under `$HOME` called `sat-tracker`
 - obfuscate portfolio value
 
+![image](https://github.com/user-attachments/assets/a65523aa-9bed-4b36-8b43-ae09e771bdc5)
+
 Planned features:
 
 - [ ] add logging of bitcoin leaving your possession

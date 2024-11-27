@@ -88,11 +88,14 @@ export default function BitcoinBuys({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const getLocaleDateString = (buyDate: Date) => {
-    const localeDate = buyDate.toLocaleDateString().split("/").join("-");
+  const getLocaleDateString = (date: Date) => {
+    const localeDate = date.toLocaleDateString().split("/").join("-");
     const [month, day, year] = localeDate.split("-");
 
-    return `${year}-${month}-${day}`;
+    const formattedMonth = month.length === 1 ? `0${month}` : month;
+    const formattedDay = day.length === 1 ? `0${day}` : day;
+
+    return `${year}-${formattedMonth}-${formattedDay}`;
   };
 
   const getLocalTimeString = (date: Date) => {
@@ -103,6 +106,12 @@ export default function BitcoinBuys({
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
     return `${formattedHours}:${formattedMinutes}`;
+  };
+
+  const formatToLocalDateTime = (date: Date): string => {
+    const localDate = getLocaleDateString(date);
+    const localTime = getLocalTimeString(date);
+    return `${localDate}T${localTime}`;
   };
 
   const handleAddBuyClick = async () => {
@@ -204,9 +213,7 @@ export default function BitcoinBuys({
               <p>Date</p>
               <input
                 type="datetime-local"
-                value={`${getLocaleDateString(buyDate)}T${getLocalTimeString(
-                  buyDate
-                )}`}
+                value={formatToLocalDateTime(buyDate)}
                 onChange={(e) => {
                   setBuyDate(new Date(e.target.value));
                 }}

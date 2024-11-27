@@ -9,6 +9,7 @@ export default function HeadlineMetrics({
   triggerRefresh: boolean;
   hideBalances: boolean;
 }) {
+  const [showInBitcoin, setShowInBitcoin] = useState(false);
   const [topStats, setTopStats] = useState<HeadlineStats>({
     bitcoinPrice: 0,
     totalReturn: 0,
@@ -19,6 +20,10 @@ export default function HeadlineMetrics({
   });
 
   const isInTheMoney = topStats.totalReturn >= 0;
+
+  const toggleBitcoin = () => {
+    setShowInBitcoin(!showInBitcoin);
+  };
 
   useEffect(() => {
     window.electron.getHeadlineStats().then(setTopStats);
@@ -37,9 +42,15 @@ export default function HeadlineMetrics({
           <p className="metric-title">Value USD</p>
           <p>{formatUsd(hideBalances ? 0 : topStats.valueUsd)}</p>
         </div>
-        <div className="metric-item bitcoin">
-          <p className="metric-title">Total Sats</p>
-          <p>{formatSats(hideBalances ? 0 : topStats.totalSats)}</p>
+        <div onClick={toggleBitcoin} className="metric-item bitcoin clickable">
+          <p className="metric-title">{showInBitcoin ? "Total Bitcoin": "Total Sats"}</p>
+          <p>
+            {hideBalances
+              ? 0
+              : showInBitcoin
+              ? BigNumber(topStats.totalSats).dividedBy(100000000).decimalPlaces(8).toNumber()
+              : formatSats(topStats.totalSats)}
+          </p>
         </div>
       </div>
 

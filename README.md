@@ -1,10 +1,10 @@
 ## Sat Tracker
 
-A simple app I made to track some bitcoin portfolio metrics. I found it useful and thought I'd share.
+A simple app I made to track your bitcoin balance. There is no wallet functionality, this is just a tool to track your bitcoin buys and a place to see your total sats bought, average price per bitcoin, and total return of your porfolio in dollars, etc with all data stored locally on your machine.
 
-All data is stored locally on your machine.
+I created this becuase logging all my buys in a spreadsheet was getting tedious.
 
-NOTE: As this project currently stands, it does not track sales of bitcoin. This tool is for sat stackers. The goal is to acquire more sats, not sell them.
+The idea is to have a place to keep track of your bitcoin balance. I use this by just logging every time I buy. I plan to add a method to track every time bitcoin is lost (onchain/withdraw fees, etc) so that I can have a more accurate picture of my total sats.
 
 ### Features
 
@@ -12,11 +12,12 @@ NOTE: As this project currently stands, it does not track sales of bitcoin. This
 - See your total sats bought, average price per bitcoin, and total return of your porfolio in dollars
 - Import your BTC/USD buys from a CSV file (Coinbase/Coinbase Pro supported)
 - All data is stored locally on your machine in a hidden folder under `$HOME` called `sat-tracker`
+- obfuscate portfolio value
 
 Planned features:
 
+- [ ] add logging of bitcoin leaving your possession
 - [ ] toggle between sats and BTC
-- [ ] obfuscate portfolio value
 - [ ] Sat Trader section to easily track Sat-denominated trades and track their performance against BTC
 - [ ] import from other exchanges
 

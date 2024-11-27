@@ -2,7 +2,7 @@
   "appId": "com.rerrl.electron",
   "files": ["dist-electron", "dist-react"],
   "extraResources": ["dist-electron/preload.cjs"],
-  "icon": "./desktopIcon.png",
+  "icon": "./icon.png",
   "mac": {
     "target": "dmg",
     "identity": null

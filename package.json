@@ -1,13 +1,14 @@
 {
   "name": "sat-tracker-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "npm-run-all --parallel dev:react dev:electron",
     "dev:react": "vite",
     "dev:electron": "npm run transpile:electron; cross-env NODE_ENV=development electron .",
+    "clean": "rm -rf dist dist-electron dist-react node_modules",
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

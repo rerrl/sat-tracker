@@ -148,11 +148,11 @@ export default function BitcoinBuys({
     return unsub;
   }, []);
 
-  // only keep editId in state for 3 seconds
+  // only keep editId in state for 2 seconds
   useEffect(() => {
     const timeout = setTimeout(() => {
       setEditId(null);
-    }, 1000);
+    }, 2000);
 
     return () => clearTimeout(timeout);
   }, [editId]);

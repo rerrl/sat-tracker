@@ -10,8 +10,12 @@ type StaticData = {
 };
 
 type EventPayloadMapping = {
+  // events to sub to
   statistics: Statistics;
   csvImported: void;
+  headlineMetrics: HeadlineStats;
+
+  // methods to call
   getStaticData: StaticData;
   getBitcoinBuys: BitcoinBuy[];
   saveBitcoinBuy: BitcoinBuy;
@@ -62,6 +66,10 @@ interface Window {
     subscribeCsvImported: (
       callback: () => void
     ) => UnsubscribeFunction;
+
+    subscribeHeadlineMetrics: (
+      callback: (headlineMetrics: HeadlineStats) => void
+    ) => UnsubscribeFunction
 
     // functions to call backend functions
     getStaticData: () => Promise<StaticData>;

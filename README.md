@@ -60,8 +60,8 @@ npm run dist:linux
 ## To Do
 
 - make metrics push data to the frontend when they are updated instead of calling `onTableUpdate()`
-- component consilidation for the 2 tables and the form
 - add deductions to metrics (update total sat holdings)
+- component consilidation for the 2 tables and the form
 - make tables less ugly (fix width, etc.)
 - consolidate api methods where we can (add entries, delete entries, etc)
 
@@ -72,4 +72,4 @@ To add a new "API" method between electron and the react UI:
 [ ] Add method to Window.electron in `types.d.ts`
 [ ] Add method name and return type to `EventPayloadMapping` in `types.d.ts`
 [ ] Add method to contextBridge.exposeInMainWorld in `src/electron/preload.cts`
-[ ] Add method handler in `src/electron/main.ts`
+[ ] Add method handler in `src/electron/main.ts` or have electron push updates by using `ipcMainHanle` or `ipcWebContentsSend` respectively

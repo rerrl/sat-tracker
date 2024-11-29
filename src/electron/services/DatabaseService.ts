@@ -1,6 +1,8 @@
 import { BigNumber } from "bignumber.js";
 import { getAppDataFolder } from "../pathResolver.js";
 import { Sequelize, DataTypes } from "sequelize";
+import { ipcWebContentsSend } from "../util.js";
+import { BrowserWindow } from "electron";
 
 class DatabaseService {
   private sequelize: Sequelize;
@@ -84,35 +86,6 @@ class DatabaseService {
     });
   }
 
-  public async saveBitcoinBuy(
-    date: Date,
-    amountPaidUsd: number,
-    amountReceivedSats: number,
-    memo: string | null
-  ): Promise<BitcoinBuy> {
-    await this.awaitDatabaseReady();
-
-    const latestBuy = await this.sequelize.models.BitcoinBuy.create({
-      date,
-      amountPaidUsd,
-      amountReceivedSats,
-      memo,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    return latestBuy.toJSON() as BitcoinBuy;
-  }
-
-  public async getBitcoinBuys(): Promise<BitcoinBuy[]> {
-    await this.awaitDatabaseReady();
-
-    const buys = await this.sequelize.models.BitcoinBuy.findAll({
-      order: [["date", "DESC"]],
-    });
-    return buys.map((buy) => buy.toJSON() as BitcoinBuy);
-  }
-
   public async getHeadlineStats(): Promise<HeadlineStats> {
     await this.awaitDatabaseReady();
 
@@ -130,9 +103,11 @@ class DatabaseService {
       (await this.sequelize.models.BitcoinBuy.sum("amountPaidUsd")) || 0;
 
     const totalSats =
-      (await this.sequelize.models.BitcoinBuy.sum("amountReceivedSats")) || 0;
+      BigNumber(await this.sequelize.models.BitcoinBuy.sum("amountReceivedSats")).minus(
+        BigNumber(await this.sequelize.models.DeductionEvent.sum("amountSats"))
+      ) || 0;
 
-    const valueUsd = (totalSats / 100000000) * this.bitcoinPrice;
+    const valueUsd = totalSats.dividedBy(100000000).multipliedBy(this.bitcoinPrice).toNumber();
 
     const totalReturn = valueUsd - totalInvested;
 
@@ -145,11 +120,32 @@ class DatabaseService {
     return {
       bitcoinPrice: this.bitcoinPrice,
       totalReturn,
-      totalSats,
+      totalSats: totalSats.toNumber(),
       valueUsd,
       averageEntry,
       totalInvested,
     };
+  }
+
+  public async saveBitcoinBuy(
+    date: Date,
+    amountPaidUsd: number,
+    amountReceivedSats: number,
+    memo: string | null
+  ): Promise<BitcoinBuy> {
+    await this.awaitDatabaseReady();
+
+    const latestBuy = await this.sequelize.models.BitcoinBuy.create({
+      date,
+      amountPaidUsd,
+      amountReceivedSats,
+      memo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await this.pushLatestHeadlineStatsToUI();
+    return latestBuy.toJSON() as BitcoinBuy;
   }
 
   public async deleteBitcoinBuy(id: number): Promise<void> {
@@ -160,6 +156,16 @@ class DatabaseService {
         id,
       },
     });
+    await this.pushLatestHeadlineStatsToUI();
+  }
+
+  public async getBitcoinBuys(): Promise<BitcoinBuy[]> {
+    await this.awaitDatabaseReady();
+
+    const buys = await this.sequelize.models.BitcoinBuy.findAll({
+      order: [["date", "DESC"]],
+    });
+    return buys.map((buy) => buy.toJSON() as BitcoinBuy);
   }
 
   public async saveBitcoinDeduction(date: Date, amountSats: number, memo: string | null): Promise<BitcoinDeduction> {
@@ -173,7 +179,20 @@ class DatabaseService {
       updatedAt: new Date(),
     });
 
+    await this.pushLatestHeadlineStatsToUI();
     return deduction.toJSON() as BitcoinDeduction;
+  }
+
+  public async deleteBitcoinDeduction(id: number): Promise<void> {
+    await this.awaitDatabaseReady();
+
+    await this.sequelize.models.DeductionEvent.destroy({
+      where: {
+        id,
+      },
+    });
+
+    await this.pushLatestHeadlineStatsToUI();
   }
 
   public async getBitcoinDeductions(): Promise<BitcoinDeduction[]> {
@@ -186,14 +205,9 @@ class DatabaseService {
     return deductions.map((deduction) => deduction.toJSON() as BitcoinDeduction);
   }
 
-  public async deleteBitcoinDeduction(id: number): Promise<void> {
+  private async pushLatestHeadlineStatsToUI(): Promise<void> {
     await this.awaitDatabaseReady();
-
-    await this.sequelize.models.DeductionEvent.destroy({
-      where: {
-        id,
-      },
-    });
+    ipcWebContentsSend("headlineMetrics", BrowserWindow.getAllWindows()[0].webContents, await this.getHeadlineStats());
   }
 
   private async awaitDatabaseReady(): Promise<void> {

@@ -3,10 +3,8 @@ import { addCommas, dropDecimal, formatSats, formatUsd } from "../utils";
 import BigNumber from "bignumber.js";
 
 export default function HeadlineMetrics({
-  triggerRefresh,
   hideBalances,
 }: {
-  triggerRefresh: boolean;
   hideBalances: boolean;
 }) {
   const [showInBitcoin, setShowInBitcoin] = useState(false);
@@ -27,7 +25,12 @@ export default function HeadlineMetrics({
 
   useEffect(() => {
     window.electron.getHeadlineStats().then(setTopStats);
-  }, [triggerRefresh]);
+
+    const unsub = window.electron.subscribeHeadlineMetrics(() => {
+      window.electron.getHeadlineStats().then(setTopStats);
+    });
+    return unsub;
+  }, []);
 
   return (
     <div>
@@ -43,12 +46,17 @@ export default function HeadlineMetrics({
           <p>{formatUsd(hideBalances ? 0 : topStats.valueUsd)}</p>
         </div>
         <div onClick={toggleBitcoin} className="metric-item bitcoin clickable">
-          <p className="metric-title">{showInBitcoin ? "Total Bitcoin": "Total Sats"}</p>
+          <p className="metric-title">
+            {showInBitcoin ? "Total Bitcoin" : "Total Sats"}
+          </p>
           <p>
             {hideBalances
               ? 0
               : showInBitcoin
-              ? BigNumber(topStats.totalSats).dividedBy(100000000).decimalPlaces(8).toNumber()
+              ? BigNumber(topStats.totalSats)
+                  .dividedBy(100000000)
+                  .decimalPlaces(8)
+                  .toNumber()
               : formatSats(topStats.totalSats)}
           </p>
         </div>

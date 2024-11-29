@@ -10,6 +10,10 @@ electron.contextBridge.exposeInMainWorld("electron", {
   subscribeCsvImported: (callback) => {
     return ipcOn("csvImported", () => callback());
   },
+  subscribeHeadlineMetrics: (callback) => {
+    return ipcOn("headlineMetrics", (headlineMetrics) => callback(headlineMetrics));
+  },
+  
   getStaticData: () => ipcInvoke("getStaticData"),
   getBitcoinBuys: () => ipcInvoke("getBitcoinBuys"),
   saveBitcoinBuy: (

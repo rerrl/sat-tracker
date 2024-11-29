@@ -29,7 +29,6 @@ export default function Home() {
         </div>
       </div>
       <HeadlineMetrics
-        triggerRefresh={triggerRefresh}
         hideBalances={hideBalances}
       />
       <Divider />

@@ -52,6 +52,33 @@ class DatabaseService {
       },
     });
 
+    this.sequelize.define("DeductionEvent", {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      amountSats: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      memo: {
+        type: DataTypes.STRING,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+    })
+
     this.sequelize.sync().then(() => {
       this.databaseReady = true;
     });
@@ -129,6 +156,40 @@ class DatabaseService {
     await this.awaitDatabaseReady();
 
     await this.sequelize.models.BitcoinBuy.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+
+  public async saveBitcoinDeduction(date: Date, amountSats: number, memo: string | null): Promise<BitcoinDeduction> {
+    await this.awaitDatabaseReady();
+
+    const deduction = await this.sequelize.models.DeductionEvent.create({
+      date,
+      amountSats,
+      memo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return deduction.toJSON() as BitcoinDeduction;
+  }
+
+  public async getBitcoinDeductions(): Promise<BitcoinDeduction[]> {
+    await this.awaitDatabaseReady();
+
+    const deductions = await this.sequelize.models.DeductionEvent.findAll({
+      order: [["date", "DESC"]],
+    });
+
+    return deductions.map((deduction) => deduction.toJSON() as BitcoinDeduction);
+  }
+
+  public async deleteBitcoinDeduction(id: number): Promise<void> {
+    await this.awaitDatabaseReady();
+
+    await this.sequelize.models.DeductionEvent.destroy({
       where: {
         id,
       },

@@ -52,3 +52,19 @@ npm run dist:mac
 npm run dist:linux
 
 ```
+
+## To Do
+
+- component consilidation for the 2 tables and the form
+- add deductions to metrics (update total sat holdings)
+- make tables less ugly (fix width, etc.)
+- consolidate api methods where we can (add entries, delete entries, etc)
+
+## Some extra notes
+
+To add a new "API" method between electron and the react UI:
+
+[ ] Add method to Window.electron in `types.d.ts`
+[ ] Add method name and return type to `EventPayloadMapping` in `types.d.ts`
+[ ] Add method to contextBridge.exposeInMainWorld in `src/electron/preload.cts`
+[ ] Add method handler in `src/electron/main.ts`

@@ -66,13 +66,26 @@ app.on("ready", async () => {
     }
   );
 
+  ipcMainHandle("deleteBitcoinBuy", (id: number) => {
+    return DatabaseService.deleteBitcoinBuy(id);
+  });
+
   ipcMainHandle("getHeadlineStats", () => {
     return DatabaseService.getHeadlineStats();
   });
 
-  ipcMainHandle("deleteBitcoinBuy", (id: number) => {
-    return DatabaseService.deleteBitcoinBuy(id);
-  });
+
+  ipcMainHandle("saveBitcoinDeduction", (date: Date, amountSats: number, memo: string) => {
+    return DatabaseService.saveBitcoinDeduction(date, amountSats, memo);
+  })
+
+  ipcMainHandle("getBitcoinDeductions", () => {
+    return DatabaseService.getBitcoinDeductions();
+  })
+
+  ipcMainHandle("deleteBitcoinDeduction", (id: number) => {
+    return DatabaseService.deleteBitcoinDeduction(id);
+  })
 
   // start the electron services to keep the UI updated
   // pollResources(mainWindow);

@@ -56,7 +56,7 @@ export default function HeadlineMetrics({
 
       <div className="row">
         <div className="metric-item neutral-blue">
-          <p className="metric-title">Average Entry</p>
+          <p className="metric-title">Avg Acquisition</p>
           <p>{formatUsd(hideBalances ? 0 : topStats.averageEntry)}</p>
         </div>
         <div

@@ -17,6 +17,9 @@ type EventPayloadMapping = {
   saveBitcoinBuy: BitcoinBuy;
   getHeadlineStats: HeadlineStats;
   deleteBitcoinBuy: void;
+  getBitcoinDeductions: BitcoinDeduction[];
+  saveBitcoinDeduction: BitcoinDeduction;
+  deleteBitcoinDeduction: void;
 };
 
 type BitcoinBuy = {
@@ -24,6 +27,15 @@ type BitcoinBuy = {
   date: Date;
   amountPaidUsd: number;
   amountReceivedSats: number;
+  memo: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type BitcoinDeduction = {
+  id: number;
+  date: Date;
+  amountSats: number;
   memo: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -62,5 +74,12 @@ interface Window {
     ) => Promise<BitcoinBuy>;
     getHeadlineStats: () => Promise<HeadlineStats>;
     deleteBitcoinBuy: (id: number) => Promise<void>;
+    getBitcoinDeductions: () => Promise<BitcoinDeduction[]>;
+    saveBitcoinDeduction: (
+      date: Date,
+      amountSats: number,
+      memo: string | null
+    ) => Promise<BitcoinDeduction>;
+    deleteBitcoinDeduction: (id: number) => Promise<void>;
   };
 }

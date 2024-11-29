@@ -21,6 +21,14 @@ electron.contextBridge.exposeInMainWorld("electron", {
     ipcInvoke("saveBitcoinBuy", date, amountPaidUsd, amountReceivedSats, memo),
   getHeadlineStats: () => ipcInvoke("getHeadlineStats"),
   deleteBitcoinBuy: (id: number) => ipcInvoke("deleteBitcoinBuy", id),
+  getBitcoinDeductions: () => ipcInvoke("getBitcoinDeductions"),
+  saveBitcoinDeduction: (
+    date: Date,
+    amountSats: number,
+    memo: string | null
+  ) => ipcInvoke("saveBitcoinDeduction", date, amountSats, memo),
+  deleteBitcoinDeduction: (id: number) =>
+    ipcInvoke("deleteBitcoinDeduction", id),
 } satisfies Window["electron"]);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

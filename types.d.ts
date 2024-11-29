@@ -10,13 +10,20 @@ type StaticData = {
 };
 
 type EventPayloadMapping = {
+  // events to sub to
   statistics: Statistics;
   csvImported: void;
+  headlineMetrics: HeadlineStats;
+
+  // methods to call
   getStaticData: StaticData;
   getBitcoinBuys: BitcoinBuy[];
   saveBitcoinBuy: BitcoinBuy;
   getHeadlineStats: HeadlineStats;
   deleteBitcoinBuy: void;
+  getBitcoinDeductions: BitcoinDeduction[];
+  saveBitcoinDeduction: BitcoinDeduction;
+  deleteBitcoinDeduction: void;
 };
 
 type BitcoinBuy = {
@@ -24,6 +31,15 @@ type BitcoinBuy = {
   date: Date;
   amountPaidUsd: number;
   amountReceivedSats: number;
+  memo: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type BitcoinDeduction = {
+  id: number;
+  date: Date;
+  amountSats: number;
   memo: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +67,10 @@ interface Window {
       callback: () => void
     ) => UnsubscribeFunction;
 
+    subscribeHeadlineMetrics: (
+      callback: (headlineMetrics: HeadlineStats) => void
+    ) => UnsubscribeFunction
+
     // functions to call backend functions
     getStaticData: () => Promise<StaticData>;
     getBitcoinBuys: () => Promise<BitcoinBuy[]>;
@@ -62,5 +82,12 @@ interface Window {
     ) => Promise<BitcoinBuy>;
     getHeadlineStats: () => Promise<HeadlineStats>;
     deleteBitcoinBuy: (id: number) => Promise<void>;
+    getBitcoinDeductions: () => Promise<BitcoinDeduction[]>;
+    saveBitcoinDeduction: (
+      date: Date,
+      amountSats: number,
+      memo: string | null
+    ) => Promise<BitcoinDeduction>;
+    deleteBitcoinDeduction: (id: number) => Promise<void>;
   };
 }

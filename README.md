@@ -1,10 +1,14 @@
 ## Sat Tracker
 
-A simple app I made to track your bitcoin balance. There is no wallet functionality, this is just a tool to track your bitcoin buys and a place to see your total sats bought, average price per bitcoin, and total return of your porfolio in dollars, etc with all data stored locally on your machine.
+A simple app I made to track your bitcoin balance. There is no wallet functionality, this is just a tool to track your bitcoin buys and a place to see your total sats bought, average price per bitcoin, and total return of your porfolio in dollars. All data is stored locally on your machine.
 
 I created this becuase logging all my buys in a spreadsheet was getting tedious.
 
-The idea is to have a place to keep track of your bitcoin balance. I use this by just logging every time I buy. I plan to add a method to track every time bitcoin is lost (onchain/withdraw fees, etc) so that I can have a more accurate picture of my total sats.
+How I use this app:
+
+- Use Acquisitions tab to log every time I buy bitcoin
+- Use Deductions tab to log bitcoin loss (exchange withdraw fees, onchain fees for consolidation, etc)
+- Since the idea is to provide a general "at a glance" view of your bitcoin holdings, the Total Return is very simply all the USD you spent on bitcoin minus the current value of your bitcoin holdings. This is not a perfect metric, but it's a good way to see how you're doing. Your current bitcoin holdings is a function of your logged buys and deductions.
 
 ### Features
 
@@ -52,3 +56,20 @@ npm run dist:mac
 npm run dist:linux
 
 ```
+
+## To Do
+
+- make metrics push data to the frontend when they are updated instead of calling `onTableUpdate()`
+- add deductions to metrics (update total sat holdings)
+- component consilidation for the 2 tables and the form
+- make tables less ugly (fix width, etc.)
+- consolidate api methods where we can (add entries, delete entries, etc)
+
+## Some extra notes
+
+To add a new "API" method between electron and the react UI:
+
+[ ] Add method to Window.electron in `types.d.ts`
+[ ] Add method name and return type to `EventPayloadMapping` in `types.d.ts`
+[ ] Add method to contextBridge.exposeInMainWorld in `src/electron/preload.cts`
+[ ] Add method handler in `src/electron/main.ts` or have electron push updates by using `ipcMainHanle` or `ipcWebContentsSend` respectively

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import BigNumber from "bignumber.js";
+// import BigNumber from "bignumber.js";
 import "../App.css";
 
 import {
@@ -8,65 +8,47 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { formatSats, formatToLocalDateTime, formatUsd } from "../utils";
+import { formatSats, formatToLocalDateTime } from "../utils";
 
-export default function BitcoinBuys({
-  hideBalances,
-}: {
-  hideBalances: boolean;
-}) {
-  const [data, setData] = useState<BitcoinBuy[]>([]);
-  const [isAddingBuy, setIsAddingBuy] = useState(false);
-  const [buyAmountUsd, setBuyAmountUsd] = useState(0);
-  const [buyAmountSats, setBuyAmountSats] = useState(0);
-  const [buyMemo, setBuyMemo] = useState<null | string>(null);
-  const [buyDate, setBuyDate] = useState<Date>(new Date());
+export default function BitcoinBuys() {
+  const [data, setData] = useState<BitcoinDeduction[]>([]);
+  const [isAddingDeduction, setIsAddingDeduction] = useState(false);
+  const [deductAmountSats, setDeductAmountSats] = useState(0);
+  const [deductMemo, setDeductMemo] = useState<null | string>(null);
+  const [deductionDate, setDeductionDate] = useState<Date>(new Date());
   const [editId, setEditId] = useState<null | number>(null);
 
-  const columnHelper = createColumnHelper<BitcoinBuy>();
+  const columnHelper = createColumnHelper<BitcoinDeduction>();
 
   const columns = [
     columnHelper.accessor("date", {
       header: () => "Date",
       cell: (info) => info.cell.getValue().toISOString().split("T")[0],
     }),
-    columnHelper.accessor("amountPaidUsd", {
-      header: () => "USD Paid",
-      cell: (info) => formatUsd(info.cell.getValue()),
-    }),
-    columnHelper.accessor("amountReceivedSats", {
-      header: () => "Sats Received",
+    columnHelper.accessor("amountSats", {
+      header: () => "Amount",
       cell: (info) => formatSats(info.cell.getValue()),
     }),
-    {
-      id: "averagePrice",
-      header: () => "Average Price per BTC",
-      cell: ({ row }: { row: { original: BitcoinBuy } }) => {
-        const amountPaidUsd = row.original.amountPaidUsd;
-        const amountReceivedSats = row.original.amountReceivedSats;
-        const amountReceivedBitcoin =
-          BigNumber(amountReceivedSats).dividedBy(100_000_000);
-        const averagePricePerBitcoin = BigNumber(amountPaidUsd).dividedBy(
-          amountReceivedBitcoin
-        );
-
-        return formatUsd(averagePricePerBitcoin.toNumber());
-      },
-    },
+    columnHelper.accessor("memo", {
+      header: () => "Memo",
+      cell: (info) => info.cell.getValue(),
+    }),
     {
       id: "delete",
       header: () => "Edit",
-      cell: ({ row }: { row: { original: BitcoinBuy } }) => {
+      cell: ({ row }: { row: { original: BitcoinDeduction } }) => {
         return (
           <button
             className={editId === row.original.id ? "negative" : ""}
             onClick={async () => {
               if (editId === row.original.id) {
-                await window.electron.deleteBitcoinBuy(row.original.id);
+                console.log("deleting deduction");
+                await window.electron.deleteBitcoinDeduction(row.original.id);
                 const newData = data.filter(
                   (buy) => buy.id !== row.original.id
                 );
                 setData(newData);
+                // onTableUpdate();
               }
 
               setEditId(row.original.id);
@@ -85,47 +67,38 @@ export default function BitcoinBuys({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const handleAddBuyClick = async () => {
-    if (isAddingBuy) {
-      if (buyAmountSats === 0 || !buyDate) {
+  const handleAddDeduction = async () => {
+    if (isAddingDeduction) {
+      if (deductAmountSats === 0 || !deductionDate) {
         alert("Please enter a valid amount");
         return;
       }
 
-      // save the buy
-      const newBuy = await window.electron.saveBitcoinBuy(
-        buyDate,
-        buyAmountUsd,
-        buyAmountSats,
-        buyMemo
+      // save the new deduction event
+      const newDeduction = await window.electron.saveBitcoinDeduction(
+        deductionDate,
+        deductAmountSats,
+        deductMemo
       );
 
-      const newData = [...data, newBuy].sort(
+      const newData = [...data, newDeduction].sort(
         (a, b) => b.date.getTime() - a.date.getTime()
       );
       setData(newData);
+      // onTableUpdate();
     } else {
-      setBuyDate(new Date());
-      setBuyAmountUsd(0);
-      setBuyAmountSats(0);
-      setBuyMemo(null);
+      setDeductionDate(new Date());
+      setDeductAmountSats(0);
+      setDeductMemo(null);
     }
 
-    setIsAddingBuy(!isAddingBuy);
+    setIsAddingDeduction(!isAddingDeduction);
   };
 
   useEffect(() => {
-    window.electron.getBitcoinBuys().then((data) => {
+    window.electron.getBitcoinDeductions().then((data) => {
       setData(data);
     });
-
-    const unsub = window.electron.subscribeCsvImported(() => {
-      window.electron.getBitcoinBuys().then((data) => {
-        setData(data);
-      });
-    });
-
-    return unsub;
   }, []);
 
   // only keep editId in state for 2 seconds
@@ -141,56 +114,55 @@ export default function BitcoinBuys({
     <>
       <div className="headline-row">
         <div className="latest-entries-title">
-          <p>{isAddingBuy ? "Add Buy Event" : "Recent Acquisitions"}</p>
+          <p>{isAddingDeduction ? "Add Deduction" : "Recent Deductions"}</p>
         </div>
 
         <div className="recent-buys-buttons">
-          {isAddingBuy ? (
+          {isAddingDeduction ? (
             <button
               className="new-entry"
-              onClick={() => setIsAddingBuy(!isAddingBuy)}
+              onClick={() => setIsAddingDeduction(!isAddingDeduction)}
             >
               Cancel
             </button>
           ) : null}
-          <button className="new-entry" onClick={handleAddBuyClick}>
-            {isAddingBuy ? "Save" : "Add Buy"}
+          <button className="new-entry" onClick={handleAddDeduction}>
+            {isAddingDeduction ? "Save" : "Add Deduction"}
           </button>
         </div>
       </div>
 
-      {isAddingBuy ? (
+      {isAddingDeduction ? (
         <>
-          <div className="row">
-            <div className="metric-item">
-              <p>USD Spent</p>
-              <input
-                type="number"
-                onChange={(e) => setBuyAmountUsd(parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="metric-item">
-              <p>Sats Received</p>
-              <input
-                type="number"
-                onChange={(e) => setBuyAmountSats(parseFloat(e.target.value))}
-              />
-            </div>
-          </div>
           <div className="row">
             <div className="metric-item">
               <p>Date</p>
               <input
                 type="datetime-local"
-                value={formatToLocalDateTime(buyDate)}
+                value={formatToLocalDateTime(deductionDate)}
                 onChange={(e) => {
-                  setBuyDate(new Date(e.target.value));
+                  setDeductionDate(new Date(e.target.value));
                 }}
               />
             </div>
             <div className="metric-item">
+              <p>Sats to deduct</p>
+              <input
+                type="number"
+                onChange={(e) =>
+                  setDeductAmountSats(parseFloat(e.target.value))
+                }
+              />
+            </div>
+          </div>
+          <div className="row">
+            <div className="metric-item">
               <p>Memo (optional)</p>
-              <input type="text" onChange={(e) => setBuyMemo(e.target.value)} />
+              <input
+                type="text"
+                maxLength={40}
+                onChange={(e) => setDeductMemo(e.target.value)}
+              />
             </div>
           </div>
         </>
@@ -222,7 +194,7 @@ export default function BitcoinBuys({
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id}>
                       {flexRender(
-                        hideBalances ? "-" : cell.column.columnDef.cell,
+                        cell.column.columnDef.cell,
                         cell.getContext()
                       )}
                     </td>

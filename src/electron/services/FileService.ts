@@ -34,6 +34,12 @@ class FileService {
         if (this.isCoinbaseCsv(parsed)) {
             return 'coinbase';
         }
+
+        if (this.isRiverCsv(parsed)) {
+            return 'river';
+        }
+
+        return 'unknown';
     }
 
     private isCoinbaseCsv = (parsed: Papa.ParseResult<any>) => {
@@ -46,6 +52,26 @@ class FileService {
             data[1][0] === 'Transactions' &&
             data[2][0] === 'User' &&
             data[3][0] === 'ID') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private isRiverCsv = (parsed: Papa.ParseResult<any>) => {
+        const data = parsed.data;
+        if (data.length < 3) {
+            return false;
+        }
+
+        const date = data[0][0];
+        const sentAmount = data[0][1];
+        const sentCurrency = data[0][2];
+
+        if (date === 'Date' &&
+            sentAmount === 'Sent Amount' &&
+            sentCurrency === 'Sent Currency') {
+            console.log('River CSV detected');
             return true;
         } else {
             return false;
@@ -136,6 +162,55 @@ class FileService {
         });
     }
 
+    private importRiverBuysCsv = async (parsed: Papa.ParseResult<any>) => {
+        const headers = parsed.data[0]
+        const data = parsed.data.slice(1);
+
+        const dateIndex = headers.indexOf('Date');
+        const sentAmountIndex = headers.indexOf('Sent Amount');
+        const sentCurrencyIndex = headers.indexOf('Sent Currency');
+        const receivedAmountIndex = headers.indexOf('Received Amount');
+        const receivedCurrencyIndex = headers.indexOf('Received Currency');
+        const feeAmountIndex = headers.indexOf('Fee Amount');
+        const tagIndex = headers.indexOf('Tag');
+
+        data.forEach(async (row: any) => {
+            const rawDate = row[dateIndex];
+            const rawSentAmount = row[sentAmountIndex];
+            const rawSentCurrency = row[sentCurrencyIndex];
+            const rawReceivedAmount = row[receivedAmountIndex];
+            const rawReceivedCurrency = row[receivedCurrencyIndex];
+            const rawFeeAmount = row[feeAmountIndex];
+            const rawTag = row[tagIndex];
+
+            // make sure row is a valid buy to import
+            if (
+                rawDate === '' ||
+                rawSentCurrency !== 'USD' ||
+                rawReceivedCurrency !== 'BTC' ||
+                rawSentAmount === '' ||
+                rawReceivedAmount === '' ||
+                rawTag !== 'Buy'
+            ) {
+                console.log("skipping")
+                return;
+            }
+
+            const date = new Date(rawDate + 'Z');
+            const fee = rawFeeAmount === '' ? 0 : parseFloat(rawFeeAmount);
+            const sentAmount = rawSentAmount === '' ? 0 : parseFloat(rawSentAmount);
+            const amountPaidUsd = BigNumber(sentAmount).plus(fee).decimalPlaces(2).toNumber();
+            const amountReceivedSats = new BigNumber(rawReceivedAmount).multipliedBy(100000000).integerValue(BigNumber.ROUND_DOWN).toNumber();
+
+            await DatabaseService.saveBitcoinBuy(
+                date,
+                amountPaidUsd,
+                amountReceivedSats,
+                'Import River CSV',
+            );
+        });
+    }
+
     public importCSV = async (mainWindow: BrowserWindow) => {
         const filesToImport = await this.promptForFile("Import CSV", "csv");
 
@@ -150,13 +225,15 @@ class FileService {
         const importType = this.identifyCsvImportType(parsed);
 
         if (importType === 'unknown') {
-            console.log('Unknown CSV format');
             return [];
         }
 
         if (importType === 'coinbase') {
-            console.log('Coinbase CSV detected');
             await this.importCoinbaseBuysCsv(parsed);
+        }
+
+        if (importType === 'river') {
+            await this.importRiverBuysCsv(parsed);
         }
 
         ipcWebContentsSend("csvImported", mainWindow.webContents, void 0);

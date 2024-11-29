@@ -99,17 +99,12 @@ class DatabaseService {
       ).bpi.USD.rate_float;
     }
 
-    const totalInvested =
-      (await this.sequelize.models.BitcoinBuy.sum("amountPaidUsd")) || 0;
-
-    const totalSats =
-      BigNumber(await this.sequelize.models.BitcoinBuy.sum("amountReceivedSats")).minus(
-        BigNumber(await this.sequelize.models.DeductionEvent.sum("amountSats"))
-      ) || 0;
-
-    const valueUsd = totalSats.dividedBy(100000000).multipliedBy(this.bitcoinPrice).toNumber();
-
-    const totalReturn = valueUsd - totalInvested;
+    const totalInvested = await this.sequelize.models.BitcoinBuy.sum("amountPaidUsd") || 0;
+    const totalSatsBought = await this.sequelize.models.BitcoinBuy.sum("amountReceivedSats") || 0;
+    const totalSatsDeducted = await this.sequelize.models.DeductionEvent.sum("amountSats") || 0;
+    const totalSats = BigNumber(totalSatsBought).minus(totalSatsDeducted).toNumber();
+    const valueUsd = BigNumber(totalSats).dividedBy(100000000).multipliedBy(this.bitcoinPrice).toNumber();
+    const totalReturn = BigNumber(valueUsd).minus(totalInvested).toNumber();
 
     const averageEntry =
       BigNumber(totalInvested)
@@ -120,10 +115,10 @@ class DatabaseService {
     return {
       bitcoinPrice: this.bitcoinPrice,
       totalReturn,
-      totalSats: totalSats.toNumber(),
+      totalSats,
       valueUsd,
       averageEntry,
-      totalInvested,
+      totalInvested
     };
   }
 

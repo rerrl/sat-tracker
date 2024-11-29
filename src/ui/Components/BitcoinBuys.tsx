@@ -12,10 +12,8 @@ import { formatSats, formatToLocalDateTime, formatUsd } from "../utils";
 
 export default function BitcoinBuys({
   hideBalances,
-  onTableUpdate,
 }: {
   hideBalances: boolean;
-  onTableUpdate: () => void;
 }) {
   const [data, setData] = useState<BitcoinBuy[]>([]);
   const [isAddingBuy, setIsAddingBuy] = useState(false);
@@ -69,7 +67,6 @@ export default function BitcoinBuys({
                   (buy) => buy.id !== row.original.id
                 );
                 setData(newData);
-                onTableUpdate();
               }
 
               setEditId(row.original.id);
@@ -90,7 +87,7 @@ export default function BitcoinBuys({
 
   const handleAddBuyClick = async () => {
     if (isAddingBuy) {
-      if (buyAmountUsd === 0 || buyAmountSats === 0 || !buyDate) {
+      if (buyAmountSats === 0 || !buyDate) {
         alert("Please enter a valid amount");
         return;
       }
@@ -107,7 +104,6 @@ export default function BitcoinBuys({
         (a, b) => b.date.getTime() - a.date.getTime()
       );
       setData(newData);
-      onTableUpdate();
     } else {
       setBuyDate(new Date());
       setBuyAmountUsd(0);
@@ -126,7 +122,6 @@ export default function BitcoinBuys({
     const unsub = window.electron.subscribeCsvImported(() => {
       window.electron.getBitcoinBuys().then((data) => {
         setData(data);
-        onTableUpdate();
       });
     });
 

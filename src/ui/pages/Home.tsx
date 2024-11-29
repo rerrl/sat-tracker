@@ -11,7 +11,6 @@ enum Screen {
 }
 
 export default function Home() {
-  const [triggerRefresh, setTriggerRefresh] = useState(false);
   const [hideBalances, setHideBalances] = useState(false);
   const [screen, setScreen] = useState<Screen>(Screen.ACQUISITIONS);
 
@@ -49,7 +48,6 @@ export default function Home() {
       {screen === Screen.ACQUISITIONS ? (
         <BitcoinBuys
           hideBalances={hideBalances}
-          onTableUpdate={() => setTriggerRefresh(!triggerRefresh)}
         />
       ) : (
         <BitcoinDeductions />

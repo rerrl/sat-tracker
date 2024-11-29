@@ -20,7 +20,7 @@ app.on("ready", async () => {
       label: "File",
       submenu: [
         {
-          label: "Import Coinbase Buys from CSV",
+          label: "Import from CSV",
           click: async () => {
             await FileService.importCSV(mainWindow);
 

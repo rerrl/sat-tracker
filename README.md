@@ -14,7 +14,7 @@ How I use this app:
 
 - Log your bitcoin buys (date, amount paid, amount of bitcoin bought)
 - See your total sats bought, average price per bitcoin, and total return of your porfolio in dollars
-- Import your BTC/USD buys from a CSV file (Coinbase/Coinbase Pro supported)
+- Import your BTC/USD buys from a CSV file (Coinbase/Coinbase Pro, River supported)
 - All data is stored locally on your machine in a hidden folder under `$HOME` called `sat-tracker`
 - obfuscate portfolio value
 
@@ -22,8 +22,6 @@ How I use this app:
 
 Planned features:
 
-- [ ] add logging of bitcoin leaving your possession
-- [ ] toggle between sats and BTC
 - [ ] Sat Trader section to easily track Sat-denominated trades and track their performance against BTC
 - [ ] import from other exchanges
 
@@ -59,11 +57,11 @@ npm run dist:linux
 
 ## To Do
 
-- make metrics push data to the frontend when they are updated instead of calling `onTableUpdate()`
-- add deductions to metrics (update total sat holdings)
+- Add migrations for sqlite so as to not corrupt user dbs
 - component consilidation for the 2 tables and the form
 - make tables less ugly (fix width, etc.)
 - consolidate api methods where we can (add entries, delete entries, etc)
+- add loading spinner when importing csv
 
 ## Some extra notes
 

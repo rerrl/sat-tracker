@@ -4,6 +4,10 @@ import { Sequelize, DataTypes } from "sequelize";
 import { ipcWebContentsSend } from "../util.js";
 import { BrowserWindow } from "electron";
 
+// const FEATURES = {
+//   SAT_TRADER: "sat-trader"
+// };
+
 class DatabaseService {
   private sequelize: Sequelize;
   private databaseReady: boolean = false;
@@ -14,76 +18,8 @@ class DatabaseService {
       dialect: "sqlite",
       storage: getAppDataFolder() + "/database.sqlite",
     });
-    this.sequelize
-      .authenticate()
-      .then(() => {
-        console.log("Connection has been established successfully.");
-      })
-      .catch((error) => {
-        console.error("Unable to connect to the database:", error);
-      });
 
-    this.sequelize.define("BitcoinBuy", {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      amountPaidUsd: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
-      amountReceivedSats: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      memo: {
-        type: DataTypes.STRING,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-    });
-
-    this.sequelize.define("DeductionEvent", {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      amountSats: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      memo: {
-        type: DataTypes.STRING,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-    })
-
-    this.sequelize.sync().then(() => {
-      this.databaseReady = true;
-    });
+    this.setupDatabase(this.sequelize);
   }
 
   public async getHeadlineStats(): Promise<HeadlineStats> {
@@ -200,6 +136,38 @@ class DatabaseService {
     return deductions.map((deduction) => deduction.toJSON() as BitcoinDeduction);
   }
 
+  // public async enableSatTrader(bool: boolean): Promise<void> {
+  //   await this.awaitDatabaseReady();
+  //   console.log("Sat trader enabled:", bool);
+
+  //   const feature = await this.sequelize.models.Features.findOne({
+  //     where: {
+  //       name: FEATURES.SAT_TRADER
+  //     }
+  //   });
+
+  //   if (feature) {
+  //     await feature.update({ enabled: bool });
+  //   } else {
+  //     await this.sequelize.models.Features.create({
+  //       name: FEATURES.SAT_TRADER,
+  //       enabled: bool
+  //     });
+  //   }
+  // }
+
+  // public async isSatTraderEnabled(): Promise<boolean> {
+  //   await this.awaitDatabaseReady();
+
+  //   const feature = await this.sequelize.models.Features.findOne({
+  //     where: {
+  //       name: FEATURES.SAT_TRADER
+  //     }
+  //   });
+
+  //   return feature?.getDataValue("enabled") || false;
+  // }
+
   private async pushLatestHeadlineStatsToUI(): Promise<void> {
     await this.awaitDatabaseReady();
     ipcWebContentsSend("headlineMetrics", BrowserWindow.getAllWindows()[0].webContents, await this.getHeadlineStats());
@@ -209,6 +177,96 @@ class DatabaseService {
     while (!this.databaseReady) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+  }
+
+  private setupDatabase(sequelize: Sequelize): void {
+    sequelize
+      .authenticate()
+      .then(() => {
+        console.log("Connection has been established successfully.");
+      })
+      .catch((error) => {
+        console.error("Unable to connect to the database:", error);
+      });
+
+    sequelize.define("BitcoinBuy", {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      amountPaidUsd: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      amountReceivedSats: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      memo: {
+        type: DataTypes.STRING,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+    });
+
+    sequelize.define("DeductionEvent", {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      amountSats: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      memo: {
+        type: DataTypes.STRING,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+    })
+
+    // sequelize.define("Features", {
+    //   id: {
+    //     type: DataTypes.INTEGER,
+    //     autoIncrement: true,
+    //     primaryKey: true,
+    //   },
+    //   name: {
+    //     type: DataTypes.STRING,
+    //     allowNull: false,
+    //     unique: true,
+    //   },
+    //   enabled: {
+    //     type: DataTypes.BOOLEAN,
+    //     allowNull: false,
+    //   },
+    // })
+
+    sequelize.sync().then(() => {
+      this.databaseReady = true;
+    });
   }
 }
 

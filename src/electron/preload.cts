@@ -13,7 +13,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
   subscribeHeadlineMetrics: (callback) => {
     return ipcOn("headlineMetrics", (headlineMetrics) => callback(headlineMetrics));
   },
-  
+
   getStaticData: () => ipcInvoke("getStaticData"),
   getBitcoinBuys: () => ipcInvoke("getBitcoinBuys"),
   saveBitcoinBuy: (
@@ -33,6 +33,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
   ) => ipcInvoke("saveBitcoinDeduction", date, amountSats, memo),
   deleteBitcoinDeduction: (id: number) =>
     ipcInvoke("deleteBitcoinDeduction", id),
+  // enableSatTrader: (bool: boolean) => ipcInvoke("enableSatTrader"),
 } satisfies Window["electron"]);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

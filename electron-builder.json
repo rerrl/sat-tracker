@@ -1,10 +1,10 @@
 {
-  "appId": "com.rerrl.electron",
+  "appId": "com.rerrl.sat-tracker",
   "files": ["dist-electron", "dist-react"],
   "extraResources": ["dist-electron/preload.cjs"],
   "icon": "./icon.png",
   "mac": {
-    "target": "dmg",
+    "target": "default",
     "identity": null
   },
   "linux": {

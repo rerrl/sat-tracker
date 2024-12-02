@@ -18,8 +18,6 @@ How I use this app:
 - All data is stored locally on your machine in a hidden folder under `$HOME` called `sat-tracker`
 - obfuscate portfolio value
 
-![image](https://github.com/user-attachments/assets/a65523aa-9bed-4b36-8b43-ae09e771bdc5)
-
 Planned features:
 
 - [ ] Sat Trader section to easily track Sat-denominated trades and track their performance against BTC
@@ -33,8 +31,8 @@ To get this running locally in development mode:
 
 ```
 git clone git@github.com:rerrl/sat-tracker.git
-npm i
-npm run dev
+yarn install
+yarn dev
 ```
 
 All data is stored in under your home folder in a hidden folder called `sat-tracker`.
@@ -45,13 +43,13 @@ To build the app for production:
 
 ```
 # windows
-npm run dist:win
+yarn dist:win
 
 # mac
-npm run dist:mac
+yarn dist:mac
 
 # linux
-npm run dist:linux
+yarn dist:linux
 
 ```
 

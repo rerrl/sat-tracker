@@ -114,6 +114,10 @@ export default function BitcoinBuys({
     setIsAddingBuy(!isAddingBuy);
   };
 
+  const handleCsvImport = async () => {
+    await window.electron.triggerCsvImport();
+  };
+
   useEffect(() => {
     window.electron.getBitcoinBuys().then((data) => {
       setData(data);
@@ -151,6 +155,11 @@ export default function BitcoinBuys({
               onClick={() => setIsAddingBuy(!isAddingBuy)}
             >
               Cancel
+            </button>
+          ) : null}
+          {!isAddingBuy ? (
+            <button className="new-entry" onClick={handleCsvImport}>
+              CSV Import
             </button>
           ) : null}
           <button className="new-entry" onClick={handleAddBuyClick}>

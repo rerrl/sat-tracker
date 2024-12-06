@@ -24,6 +24,7 @@ type EventPayloadMapping = {
   getBitcoinDeductions: BitcoinDeduction[];
   saveBitcoinDeduction: BitcoinDeduction;
   deleteBitcoinDeduction: void;
+  triggerCsvImport: void;
   // enableSatTrader: void;
 };
 
@@ -90,6 +91,7 @@ interface Window {
       memo: string | null
     ) => Promise<BitcoinDeduction>;
     deleteBitcoinDeduction: (id: number) => Promise<void>;
+    triggerCsvImport: () => Promise<void>;
     // enableSatTrader: (bool: boolean) => void;
   };
 }

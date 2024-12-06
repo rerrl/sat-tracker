@@ -211,11 +211,11 @@ class FileService {
         });
     }
 
-    public importCSV = async (mainWindow: BrowserWindow) => {
+    public importCSV = async (): Promise<void> => {
         const filesToImport = await this.promptForFile("Import CSV", "csv");
 
         if (filesToImport.length === 0) {
-            return [];
+            return;
         }
 
         const file = filesToImport[0];
@@ -225,7 +225,7 @@ class FileService {
         const importType = this.identifyCsvImportType(parsed);
 
         if (importType === 'unknown') {
-            return [];
+            return;
         }
 
         if (importType === 'coinbase') {
@@ -236,7 +236,8 @@ class FileService {
             await this.importRiverBuysCsv(parsed);
         }
 
-        ipcWebContentsSend("csvImported", mainWindow.webContents, void 0);
+        ipcWebContentsSend("csvImported", BrowserWindow.getAllWindows()[0].webContents, void 0);
+        return;
     }
 }
 

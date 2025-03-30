@@ -1,10 +1,9 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { ipcMainHandle, isDev } from "./util.js";
 import { getStaticData } from "./services/resource.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import DatabaseService from "./services/DatabaseService.js";
 import FileService from "./services/FileService.js";
-
 
 app.on("ready", async () => {
   // const isSatTraderEnabled = await DatabaseService.isSatTraderEnabled();
@@ -60,22 +59,28 @@ app.on("ready", async () => {
     return DatabaseService.getHeadlineStats();
   });
 
-
-  ipcMainHandle("saveBitcoinDeduction", (date: Date, amountSats: number, memo: string) => {
-    return DatabaseService.saveBitcoinDeduction(date, amountSats, memo);
-  })
+  ipcMainHandle(
+    "saveBitcoinDeduction",
+    (date: Date, amountSats: number, memo: string) => {
+      return DatabaseService.saveBitcoinDeduction(date, amountSats, memo);
+    }
+  );
 
   ipcMainHandle("getBitcoinDeductions", () => {
     return DatabaseService.getBitcoinDeductions();
-  })
+  });
 
   ipcMainHandle("deleteBitcoinDeduction", (id: number) => {
     return DatabaseService.deleteBitcoinDeduction(id);
-  })
+  });
 
   ipcMainHandle("triggerCsvImport", () => {
     return FileService.importCSV();
-  })
+  });
+
+  ipcMainHandle("saveManualBitcoinPrice", (price: number) => {
+    return DatabaseService.saveManualBitcoinPrice(price);
+  });
 
   // ipcMainHandle("enableSatTrader", (bool: boolean) => {
   //   return DatabaseService.enableSatTrader(bool);

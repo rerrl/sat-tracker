@@ -16,6 +16,8 @@ export default function HeadlineMetrics({
     averageEntry: 0,
     totalInvested: 0,
   });
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [manualPrice, setManualPrice] = useState("");
 
   const isInTheMoney = topStats.totalReturn >= 0;
 
@@ -35,9 +37,45 @@ export default function HeadlineMetrics({
   return (
     <div>
       <div className="row">
-        <div className="metric-item neutral-blue">
+        <div 
+          className="metric-item neutral-blue clickable"
+          onClick={() => {
+            setIsEditingPrice(true);
+            setManualPrice(topStats.bitcoinPrice.toString());
+          }}
+        >
           <p className="metric-title">Bitcoin Price</p>
-          <p>{formatUsd(topStats.bitcoinPrice)}</p>
+          {isEditingPrice ? (
+            <input
+              type="number"
+              value={manualPrice}
+              onChange={(e) => setManualPrice(e.target.value)}
+              onBlur={async () => {
+                const newPrice = parseFloat(manualPrice) || 0;
+                setTopStats(prev => ({
+                  ...prev,
+                  bitcoinPrice: newPrice
+                }));
+                await window.electron.saveManualBitcoinPrice(newPrice);
+                setIsEditingPrice(false);
+              }}
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter') {
+                  const newPrice = parseFloat(manualPrice) || 0;
+                  setTopStats(prev => ({
+                    ...prev,
+                    bitcoinPrice: newPrice
+                  }));
+                  await window.electron.saveManualBitcoinPrice(newPrice);
+                  setIsEditingPrice(false);
+                }
+              }}
+              autoFocus
+              className="price-input"
+            />
+          ) : (
+            <p>{formatUsd(topStats.bitcoinPrice)}</p>
+          )}
         </div>
         <div
           className={`metric-item ${isInTheMoney ? "positive" : "negative"}`}

@@ -8,7 +8,7 @@
     "dev": "npm-run-all --parallel dev:react dev:electron",
     "dev:react": "vite",
     "dev:electron": "yarn transpile:electron; cross-env NODE_ENV=development electron .",
-    "clean": "rm -rf dist dist-electron dist-react node_modules && yarn install",
+    "clean": "rm -rf dist dist-electron dist-react node_modules && yarn cache clean && yarn install",
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

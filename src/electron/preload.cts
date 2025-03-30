@@ -34,6 +34,10 @@ electron.contextBridge.exposeInMainWorld("electron", {
   deleteBitcoinDeduction: (id: number) =>
     ipcInvoke("deleteBitcoinDeduction", id),
   triggerCsvImport: () => ipcInvoke("triggerCsvImport"),
+  
+  saveManualBitcoinPrice: (price: number) =>
+    ipcInvoke("saveManualBitcoinPrice", price),
+  
   // enableSatTrader: (bool: boolean) => ipcInvoke("enableSatTrader"),
 } satisfies Window["electron"]);
 

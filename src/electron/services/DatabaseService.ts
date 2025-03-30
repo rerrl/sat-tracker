@@ -26,12 +26,26 @@ class DatabaseService {
     await this.awaitDatabaseReady();
 
     if (this.bitcoinPrice === 0) {
-      const bitcoinPriceResponse = await fetch(
-        "https://data-api.coindesk.com/index/cc/v1/latest/tick?market=cadli&instruments=BTC-USD&apply_mapping=true"
-      );
-
-      this.bitcoinPrice = (await bitcoinPriceResponse.json()).Data["BTC-USD"]
-        .VALUE as number;
+      // Check for manual price first
+      const manualPrice = await this.sequelize.models.ManualPrice.findOne({
+        order: [['updatedAt', 'DESC']]
+      });
+      
+      if (manualPrice) {
+        this.bitcoinPrice = manualPrice.getDataValue("price");
+      } else {
+        // Fallback to API if no manual price exists
+        try {
+          const bitcoinPriceResponse = await fetch(
+            "https://data-api.coindesk.com/index/cc/v1/latest/tick?market=cadli&instruments=BTC-USD&apply_mapping=true"
+          );
+          this.bitcoinPrice = (await bitcoinPriceResponse.json()).Data["BTC-USD"]
+            .VALUE as number;
+        } catch (error) {
+          console.error("Failed to fetch Bitcoin price:", error);
+          this.bitcoinPrice = 0;
+        }
+      }
     }
 
     const totalInvested =
@@ -123,6 +137,24 @@ class DatabaseService {
 
     await this.pushLatestHeadlineStatsToUI();
     return deduction.toJSON() as BitcoinDeduction;
+  }
+
+  public async saveManualBitcoinPrice(price: number): Promise<void> {
+    await this.awaitDatabaseReady();
+    await this.sequelize.models.ManualPrice.create({
+      price,
+      updatedAt: new Date()
+    });
+    this.bitcoinPrice = price;
+    // Force update all headline stats with the new price
+    const updatedStats = await this.getHeadlineStats();
+    await this.pushLatestHeadlineStatsToUI();
+    // Also update the UI with the new stats
+    ipcWebContentsSend(
+      "headlineMetrics",
+      BrowserWindow.getAllWindows()[0].webContents,
+      updatedStats
+    );
   }
 
   public async deleteBitcoinDeduction(id: number): Promise<void> {
@@ -229,6 +261,22 @@ class DatabaseService {
       },
       createdAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+    });
+
+    sequelize.define("ManualPrice", {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      price: {
+        type: DataTypes.FLOAT,
         allowNull: false,
       },
       updatedAt: {

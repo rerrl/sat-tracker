@@ -26,24 +26,22 @@ class DatabaseService {
     await this.awaitDatabaseReady();
 
     if (this.bitcoinPrice === 0) {
-      // Check for manual price first
-      const manualPrice = await this.sequelize.models.ManualPrice.findOne({
-        order: [['updatedAt', 'DESC']]
-      });
-      
-      if (manualPrice) {
-        this.bitcoinPrice = manualPrice.getDataValue("price");
-      } else {
-        // Fallback to API if no manual price exists
-        try {
-          const bitcoinPriceResponse = await fetch(
-            "https://data-api.coindesk.com/index/cc/v1/latest/tick?market=cadli&instruments=BTC-USD&apply_mapping=true"
-          );
-          this.bitcoinPrice = (await bitcoinPriceResponse.json()).Data["BTC-USD"]
-            .VALUE as number;
-        } catch (error) {
-          console.error("Failed to fetch Bitcoin price:", error);
-          this.bitcoinPrice = 0;
+      try {
+        const bitcoinPriceResponse = await fetch(
+          "https://data-api.coindesk.com/index/cc/v1/latest/tick?market=cadli&instruments=BTC-USD&apply_mapping=true"
+        );
+        this.bitcoinPrice = (await bitcoinPriceResponse.json()).Data["BTC-USD"]
+          .VALUE as number;
+      } catch (error) {
+        console.error("Failed to fetch Bitcoin price:", error);
+        // Only use manual price if API fails and we have one set this session
+        if (this.bitcoinPrice === 0) {
+          const manualPrice = await this.sequelize.models.ManualPrice.findOne({
+            order: [['updatedAt', 'DESC']]
+          });
+          if (manualPrice) {
+            this.bitcoinPrice = manualPrice.getDataValue("price");
+          }
         }
       }
     }

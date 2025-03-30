@@ -4,10 +4,6 @@ import { Sequelize, DataTypes } from "sequelize";
 import { ipcWebContentsSend } from "../util.js";
 import { BrowserWindow } from "electron";
 
-// const FEATURES = {
-//   SAT_TRADER: "sat-trader"
-// };
-
 class DatabaseService {
   private sequelize: Sequelize;
   private databaseReady: boolean = false;
@@ -37,7 +33,7 @@ class DatabaseService {
         // Only use manual price if API fails and we have one set this session
         if (this.bitcoinPrice === 0) {
           const manualPrice = await this.sequelize.models.ManualPrice.findOne({
-            order: [['updatedAt', 'DESC']]
+            order: [["updatedAt", "DESC"]],
           });
           if (manualPrice) {
             this.bitcoinPrice = manualPrice.getDataValue("price");
@@ -141,7 +137,7 @@ class DatabaseService {
     await this.awaitDatabaseReady();
     await this.sequelize.models.ManualPrice.create({
       price,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     this.bitcoinPrice = price;
     // Force update all headline stats with the new price
@@ -178,38 +174,6 @@ class DatabaseService {
       (deduction) => deduction.toJSON() as BitcoinDeduction
     );
   }
-
-  // public async enableSatTrader(bool: boolean): Promise<void> {
-  //   await this.awaitDatabaseReady();
-  //   console.log("Sat trader enabled:", bool);
-
-  //   const feature = await this.sequelize.models.Features.findOne({
-  //     where: {
-  //       name: FEATURES.SAT_TRADER
-  //     }
-  //   });
-
-  //   if (feature) {
-  //     await feature.update({ enabled: bool });
-  //   } else {
-  //     await this.sequelize.models.Features.create({
-  //       name: FEATURES.SAT_TRADER,
-  //       enabled: bool
-  //     });
-  //   }
-  // }
-
-  // public async isSatTraderEnabled(): Promise<boolean> {
-  //   await this.awaitDatabaseReady();
-
-  //   const feature = await this.sequelize.models.Features.findOne({
-  //     where: {
-  //       name: FEATURES.SAT_TRADER
-  //     }
-  //   });
-
-  //   return feature?.getDataValue("enabled") || false;
-  // }
 
   private async pushLatestHeadlineStatsToUI(): Promise<void> {
     await this.awaitDatabaseReady();

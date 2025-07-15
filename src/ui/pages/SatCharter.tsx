@@ -1,4 +1,4 @@
-import React from "react";
+import Chart from "../Components/Chart";
 
 export default function SatCharter() {
   return (
@@ -7,7 +7,7 @@ export default function SatCharter() {
         <h1>Sat Charter</h1>
       </div>
       <div>
-        <p>Sat Charter content will go here</p>
+        <Chart />
       </div>
     </div>
   );

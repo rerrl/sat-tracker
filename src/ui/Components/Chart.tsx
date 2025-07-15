@@ -53,6 +53,7 @@ export default function Chart() {
       totalSats: runningTotal,
       newSats: buy.amountReceivedSats,
       date: new Date(buy.date).toLocaleDateString(),
+      timestamp: new Date(buy.date).getTime(), // Use timestamp for x-axis positioning
       memo: buy.memo || undefined,
       amountPaidUsd: buy.amountPaidUsd
     });
@@ -69,15 +70,24 @@ export default function Chart() {
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="index" 
-              label={{ value: 'Transaction Number', position: 'insideBottom', offset: -5 }} 
+              dataKey="timestamp" 
+              type="number"
+              domain={['dataMin', 'dataMax']}
+              tickFormatter={(timestamp) => {
+                return new Date(timestamp).toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+              }}
+              label={{ value: 'Date', position: 'insideBottom', offset: -5 }} 
             />
             <YAxis 
               label={{ value: 'Total Sats', angle: -90, position: 'insideLeft', offset: -15 }} 
               tickFormatter={(value) => value.toLocaleString()}
             />
             <Tooltip 
-              formatter={(value: number) => [value.toLocaleString() + " sats", "Total"]}
+              formatter={(value: number, name: string) => {
+                if (name === "Total Sats") return [value.toLocaleString() + " sats", "Total"];
+                return [value, name];
+              }}
+              labelFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;

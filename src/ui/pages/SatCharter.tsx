@@ -1,6 +1,10 @@
 import Chart from "../Components/Chart";
 
-export default function SatCharter() {
+interface SatCharterProps {
+  hideBalances: boolean;
+}
+
+export default function SatCharter({ hideBalances }: SatCharterProps) {
   return (
     <div className="container" style={{ width: "100%", padding: "0" }}>
       <div className="title-header">
@@ -8,7 +12,7 @@ export default function SatCharter() {
         <p>Visualization of your Bitcoin purchases over time</p>
       </div>
       <div className="chart-container" style={{ width: "100%", maxWidth: "1400px", margin: "0 auto" }}>
-        <Chart />
+        <Chart hideBalances={hideBalances} />
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { useState } from "react";
 import HeadlineMetrics from "../Components/HeadlineMetrics";
 import BitcoinBuys from "../Components/BitcoinBuys";
 import Divider from "../Components/Divider";
@@ -10,34 +9,17 @@ enum Screen {
   DEDUCTIONS,
 }
 
-export default function SatTracker() {
-  const [hideBalances, setHideBalances] = useState(false);
+interface SatTrackerProps {
+  hideBalances: boolean;
+}
+
+export default function SatTracker({ hideBalances }: SatTrackerProps) {
   const [screen, setScreen] = useState<Screen>(Screen.ACQUISITIONS);
-
-  useEffect(() => {
-    const handleBlur = () => {
-      setHideBalances(true);
-    };
-
-    window.addEventListener('blur', handleBlur);
-    
-    return () => {
-      window.removeEventListener('blur', handleBlur);
-    };
-  }, []);
 
   return (
     <div className="container">
       <div className="title-header">
         <h1>Sat Tracker</h1>
-        <div
-          className="eye-logos clickable"
-          onClick={() => {
-            setHideBalances(!hideBalances);
-          }}
-        >
-          {hideBalances ? <IoEyeOutline /> : <IoEyeOffOutline />}
-        </div>
       </div>
       <HeadlineMetrics
         hideBalances={hideBalances}

@@ -10,7 +10,11 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-export default function Chart() {
+interface ChartProps {
+  hideBalances: boolean;
+}
+
+export default function Chart({ hideBalances }: ChartProps) {
   const [bitcoinBuys, setBitcoinBuys] = useState<BitcoinBuy[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -102,9 +106,9 @@ export default function Chart() {
                     }}>
                       <p><strong>Transaction:</strong> #{data.index}</p>
                       <p><strong>Date:</strong> {data.date}</p>
-                      <p><strong>Total Sats:</strong> {data.totalSats.toLocaleString()}</p>
-                      <p><strong>New Sats:</strong> +{data.newSats.toLocaleString()}</p>
-                      <p><strong>Amount Paid:</strong> ${data.amountPaidUsd.toFixed(2)}</p>
+                      <p><strong>Total Sats:</strong> {hideBalances ? "****" : data.totalSats.toLocaleString()}</p>
+                      <p><strong>New Sats:</strong> {hideBalances ? "****" : "+" + data.newSats.toLocaleString()}</p>
+                      <p><strong>Amount Paid:</strong> {hideBalances ? "$****" : "$" + data.amountPaidUsd.toFixed(2)}</p>
                       {data.memo && <p><strong>Memo:</strong> {data.memo}</p>}
                     </div>
                   );

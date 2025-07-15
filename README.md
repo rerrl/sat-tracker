@@ -53,6 +53,11 @@ yarn dist:linux
 
 ```
 
+## How to use Bump Version
+```
+yarn bump-version <version>
+```
+
 ## To Do
 
 - Add migrations for sqlite so as to not corrupt user dbs

@@ -6,7 +6,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState<"tracker" | "charter">("tracker");
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <div className="navigation-buttons">
         {currentPage === "tracker" ? (
           <button onClick={() => setCurrentPage("charter")}>Go to Sat Charter</button>

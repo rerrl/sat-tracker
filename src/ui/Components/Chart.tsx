@@ -7,10 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  ScatterChart,
-  Scatter,
-  ZAxis
+  ResponsiveContainer
 } from "recharts";
 
 export default function Chart() {
@@ -40,70 +37,64 @@ export default function Chart() {
     return <div>No Bitcoin purchase data available to display.</div>;
   }
 
-  // Sort by date for the chart
+  // Sort by date (oldest first)
   const sortedBuys = [...bitcoinBuys].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
-  // Create one data point per buy
-  const chartData = sortedBuys.map((buy) => ({
-    id: buy.id,
-    date: new Date(buy.date).toLocaleDateString(),
-    amountPaidUsd: buy.amountPaidUsd,
-    amountReceivedSats: buy.amountReceivedSats,
-    pricePerSat: buy.amountReceivedSats > 0 
-      ? buy.amountPaidUsd / buy.amountReceivedSats 
-      : 0,
-    memo: buy.memo || ""
-  }));
+  // Calculate cumulative sat holdings for each transaction
+  const chartData = [];
+  let runningTotal = 0;
+
+  sortedBuys.forEach((buy, index) => {
+    runningTotal += buy.amountReceivedSats;
+    chartData.push({
+      index: index + 1, // Transaction number (1-based)
+      totalSats: runningTotal,
+      newSats: buy.amountReceivedSats,
+      date: new Date(buy.date).toLocaleDateString(),
+      memo: buy.memo || undefined,
+      amountPaidUsd: buy.amountPaidUsd
+    });
+  });
 
   return (
-    <div className="chart-container">
-      <h3>Bitcoin Acquisition History</h3>
-      <div style={{ width: "100%", height: 400 }}>
+    <div className="chart-container" style={{ width: "100%" }}>
+      <h3>Total Bitcoin Holdings Over Time</h3>
+      <div style={{ width: "100%", height: 500 }}>
         <ResponsiveContainer>
-          <ScatterChart
-            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+          <LineChart
+            data={chartData}
+            margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
           >
-            <CartesianGrid />
+            <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              type="category" 
-              dataKey="date" 
-              name="Date" 
-              allowDuplicatedCategory={false} 
+              dataKey="index" 
+              label={{ value: 'Transaction Number', position: 'insideBottom', offset: -5 }} 
             />
             <YAxis 
-              type="number" 
-              dataKey="amountReceivedSats" 
-              name="Sats" 
-              label={{ value: 'Sats Received', angle: -90, position: 'insideLeft' }} 
-            />
-            <ZAxis 
-              type="number" 
-              dataKey="amountPaidUsd" 
-              range={[60, 400]} 
-              name="USD" 
+              label={{ value: 'Total Sats', angle: -90, position: 'insideLeft', offset: -15 }} 
+              tickFormatter={(value) => value.toLocaleString()}
             />
             <Tooltip 
-              cursor={{ strokeDasharray: '3 3' }}
-              formatter={(value, name, props) => {
-                if (name === "Sats") return [`${value.toLocaleString()} sats`, name];
-                if (name === "USD") return [`$${value.toLocaleString()}`, name];
-                return [value, name];
-              }}
-              content={({ active, payload }) => {
+              formatter={(value: number) => [value.toLocaleString() + " sats", "Total"]}
+              content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
                     <div className="custom-tooltip" style={{ 
-                      backgroundColor: '#fff', 
+                      backgroundColor: '#2a2a2a', 
+                      color: '#ffffff',
                       padding: '10px', 
-                      border: '1px solid #ccc' 
+                      border: '1px solid #444',
+                      borderRadius: '4px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
                     }}>
+                      <p><strong>Transaction:</strong> #{data.index}</p>
                       <p><strong>Date:</strong> {data.date}</p>
-                      <p><strong>Sats:</strong> {data.amountReceivedSats.toLocaleString()}</p>
-                      <p><strong>USD:</strong> ${data.amountPaidUsd.toFixed(2)}</p>
-                      <p><strong>Price/BTC:</strong> ${(data.pricePerSat * 100000000).toFixed(2)}</p>
+                      <p><strong>Total Sats:</strong> {data.totalSats.toLocaleString()}</p>
+                      <p><strong>New Sats:</strong> +{data.newSats.toLocaleString()}</p>
+                      <p><strong>Amount Paid:</strong> ${data.amountPaidUsd.toFixed(2)}</p>
                       {data.memo && <p><strong>Memo:</strong> {data.memo}</p>}
                     </div>
                   );
@@ -111,13 +102,16 @@ export default function Chart() {
                 return null;
               }}
             />
-            <Legend />
-            <Scatter 
-              name="Bitcoin Purchases" 
-              data={chartData} 
-              fill="#f2a900" 
+            <Legend wrapperStyle={{ paddingTop: "10px" }} />
+            <Line 
+              type="monotone" 
+              dataKey="totalSats" 
+              stroke="#f2a900" 
+              name="Total Sats" 
+              dot={{ r: 4 }}
+              activeDot={{ r: 8 }}
             />
-          </ScatterChart>
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>

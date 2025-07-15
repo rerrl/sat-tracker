@@ -97,7 +97,7 @@ export default function Chart({ hideBalances }: ChartProps) {
                   const data = payload[0].payload;
                   return (
                     <div className="custom-tooltip" style={{ 
-                      backgroundColor: '#2a2a2a', 
+                      backgroundColor: 'rgba(42, 42, 42, 0.8)', 
                       color: '#ffffff',
                       padding: '10px', 
                       border: '1px solid #444',

@@ -143,12 +143,12 @@ export default function BitcoinBuys({
 
   return (
     <>
-      <div className="headline-row">
+      <div className="headline-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
         <div className="latest-entries-title">
           <p>{isAddingBuy ? "Add Buy Event" : "Recent Acquisitions"}</p>
         </div>
 
-        <div className="recent-buys-buttons">
+        <div className="recent-buys-buttons" style={{ marginLeft: "20px" }}>
           {isAddingBuy ? (
             <button
               className="new-entry"

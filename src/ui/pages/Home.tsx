@@ -1,57 +1,20 @@
 import { useState } from "react";
-import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import HeadlineMetrics from "../Components/HeadlineMetrics";
-import BitcoinBuys from "../Components/BitcoinBuys";
-import Divider from "../Components/Divider";
-import BitcoinDeductions from "../Components/BitcoinDeductions";
-
-enum Screen {
-  ACQUISITIONS,
-  DEDUCTIONS,
-}
+import SatTracker from "./SatTracker";
+import SatCharter from "./SatCharter";
 
 export default function Home() {
-  const [hideBalances, setHideBalances] = useState(false);
-  const [screen, setScreen] = useState<Screen>(Screen.ACQUISITIONS);
+  const [currentPage, setCurrentPage] = useState<"tracker" | "charter">("tracker");
 
   return (
-    <div className="container">
-      <div className="title-header">
-        <h1>Sat Tracker</h1>
-        <div
-          className="eye-logos clickable"
-          onClick={() => {
-            setHideBalances(!hideBalances);
-          }}
-        >
-          {hideBalances ? <IoEyeOutline /> : <IoEyeOffOutline />}
-        </div>
+    <div>
+      <div className="navigation-buttons">
+        {currentPage === "tracker" ? (
+          <button onClick={() => setCurrentPage("charter")}>Go to Sat Charter</button>
+        ) : (
+          <button onClick={() => setCurrentPage("tracker")}>Back to Tracker</button>
+        )}
       </div>
-      <HeadlineMetrics
-        hideBalances={hideBalances}
-      />
-      <Divider />
-      <div className="tabs">
-        <button
-          className={screen === Screen.ACQUISITIONS ? "active" : ""}
-          onClick={() => setScreen(Screen.ACQUISITIONS)}
-        >
-          Acquisitions
-        </button>
-        <button
-          className={screen === Screen.DEDUCTIONS ? "active" : ""}
-          onClick={() => setScreen(Screen.DEDUCTIONS)}
-        >
-          Deductions
-        </button>
-      </div>
-      {screen === Screen.ACQUISITIONS ? (
-        <BitcoinBuys
-          hideBalances={hideBalances}
-        />
-      ) : (
-        <BitcoinDeductions />
-      )}
+      {currentPage === "tracker" ? <SatTracker /> : <SatCharter />}
     </div>
   );
 }

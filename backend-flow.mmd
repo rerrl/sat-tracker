@@ -1,0 +1,9 @@
+sequenceDiagram
+    participant Frontend
+    participant MainProcess
+    participant Services
+    
+    Frontend->>MainProcess: IPC Call
+    MainProcess->>Services: Route to appropriate service
+    Services-->>MainProcess: Process request
+    MainProcess-->>Frontend: Return response

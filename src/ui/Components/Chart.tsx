@@ -47,7 +47,7 @@ export default function Chart({ hideBalances }: ChartProps) {
   );
 
   // Calculate cumulative sat holdings for each transaction
-  const chartData = [];
+  const chartData: any = [];
   let runningTotal = 0;
 
   sortedBuys.forEach((buy, index) => {

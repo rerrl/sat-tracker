@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { formatSats, formatToLocalDateTime } from "../utils";
 
-export default function BitcoinBuys() {
+export default function BitcoinDeductions({ isLegacyMode = false }: { isLegacyMode?: boolean }) {
   const [data, setData] = useState<BitcoinDeduction[]>([]);
   const [isAddingDeduction, setIsAddingDeduction] = useState(false);
   const [deductAmountSats, setDeductAmountSats] = useState(0);
@@ -68,6 +68,11 @@ export default function BitcoinBuys() {
   });
 
   const handleAddDeduction = async () => {
+    if (isLegacyMode) {
+      alert("Adding new deductions is disabled in legacy mode. Please use Balance Events.");
+      return;
+    }
+
     if (isAddingDeduction) {
       if (deductAmountSats === 0 || !deductionDate) {
         alert("Please enter a valid amount");
@@ -114,7 +119,7 @@ export default function BitcoinBuys() {
     <>
       <div className="headline-row">
         <div className="latest-entries-title">
-          <p>{isAddingDeduction ? "Add Deduction" : "Recent Deductions"}</p>
+          <p>{isAddingDeduction ? "Add Deduction" : `Recent Deductions${isLegacyMode ? " (Legacy)" : ""}`}</p>
         </div>
 
         <div className="recent-buys-buttons">
@@ -126,7 +131,11 @@ export default function BitcoinBuys() {
               Cancel
             </button>
           ) : null}
-          <button className="new-entry" onClick={handleAddDeduction}>
+          <button 
+            className={`new-entry ${isLegacyMode ? "disabled" : ""}`}
+            onClick={handleAddDeduction}
+            disabled={isLegacyMode}
+          >
             {isAddingDeduction ? "Save" : "Add Deduction"}
           </button>
         </div>

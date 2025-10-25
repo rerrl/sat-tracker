@@ -82,6 +82,14 @@ app.on("ready", async () => {
     return DatabaseService.saveManualBitcoinPrice(price);
   });
 
+  ipcMainHandle("createBalanceChangeEvent", (amountSats: number, valueCents: number | null, type: 'buy' | 'sell' | 'fee', memo: string | null) => {
+    return DatabaseService.createBalanceChangeEvent(amountSats, valueCents, type, memo);
+  });
+
+  ipcMainHandle("getBalanceChangeEvents", (page: number = 1, limit: number = 20) => {
+    return DatabaseService.getBalanceChangeEvents(page, limit);
+  });
+
   // ipcMainHandle("enableSatTrader", (bool: boolean) => {
   //   return DatabaseService.enableSatTrader(bool);
   // })

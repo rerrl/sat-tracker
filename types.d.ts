@@ -26,6 +26,8 @@ type EventPayloadMapping = {
   deleteBitcoinDeduction: void;
   triggerCsvImport: void;
   saveManualBitcoinPrice: void;
+  createBalanceChangeEvent: BalanceChangeEvent;
+  getBalanceChangeEvents: { events: BalanceChangeEvent[], total: number, totalPages: number };
   // enableSatTrader: void;
 };
 
@@ -55,6 +57,15 @@ type HeadlineStats = {
   valueUsd: number;
   averageEntry: number;
   totalInvested: number;
+};
+
+type BalanceChangeEvent = {
+  id: string;
+  amountSats: number;
+  valueCents: number | null;
+  type: 'buy' | 'sell' | 'fee';
+  memo: string | null;
+  createdAt: Date;
 };
 
 type UnsubscribeFunction = () => void;
@@ -94,6 +105,16 @@ interface Window {
     deleteBitcoinDeduction: (id: number) => Promise<void>;
     triggerCsvImport: () => Promise<void>;
     saveManualBitcoinPrice: (price: number) => Promise<void>;
+    createBalanceChangeEvent: (
+      amountSats: number,
+      valueCents: number | null,
+      type: 'buy' | 'sell' | 'fee',
+      memo: string | null
+    ) => Promise<BalanceChangeEvent>;
+    getBalanceChangeEvents: (
+      page?: number,
+      limit?: number
+    ) => Promise<{ events: BalanceChangeEvent[], total: number, totalPages: number }>;
     // enableSatTrader: (bool: boolean) => void;
   };
 }

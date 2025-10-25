@@ -12,8 +12,10 @@ import { formatSats, formatToLocalDateTime, formatUsd } from "../utils";
 
 export default function BitcoinBuys({
   hideBalances,
+  isLegacyMode = false,
 }: {
   hideBalances: boolean;
+  isLegacyMode?: boolean;
 }) {
   const [data, setData] = useState<BitcoinBuy[]>([]);
   const [isAddingBuy, setIsAddingBuy] = useState(false);
@@ -86,6 +88,11 @@ export default function BitcoinBuys({
   });
 
   const handleAddBuyClick = async () => {
+    if (isLegacyMode) {
+      alert("Adding new buys is disabled in legacy mode. Please use Balance Events.");
+      return;
+    }
+    
     if (isAddingBuy) {
       if (buyAmountSats === 0 || !buyDate) {
         alert("Please enter a valid amount");
@@ -115,6 +122,11 @@ export default function BitcoinBuys({
   };
 
   const handleCsvImport = async () => {
+    if (isLegacyMode) {
+      alert("CSV import is disabled in legacy mode. Please use Balance Events.");
+      return;
+    }
+    
     await window.electron.triggerCsvImport();
   };
 
@@ -145,7 +157,7 @@ export default function BitcoinBuys({
     <>
       <div className="headline-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
         <div className="latest-entries-title">
-          <p>{isAddingBuy ? "Add Buy Event" : "Recent Acquisitions"}</p>
+          <p>{isAddingBuy ? "Add Buy Event" : `Recent Acquisitions${isLegacyMode ? " (Legacy)" : ""}`}</p>
         </div>
 
         <div className="recent-buys-buttons" style={{ marginLeft: "20px" }}>
@@ -157,12 +169,16 @@ export default function BitcoinBuys({
               Cancel
             </button>
           ) : null}
-          {!isAddingBuy ? (
+          {!isAddingBuy && !isLegacyMode ? (
             <button className="new-entry" onClick={handleCsvImport}>
               CSV Import
             </button>
           ) : null}
-          <button className="new-entry" onClick={handleAddBuyClick}>
+          <button 
+            className={`new-entry ${isLegacyMode ? "disabled" : ""}`}
+            onClick={handleAddBuyClick}
+            disabled={isLegacyMode}
+          >
             {isAddingBuy ? "Save" : "Add Buy"}
           </button>
         </div>

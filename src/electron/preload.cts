@@ -38,6 +38,16 @@ electron.contextBridge.exposeInMainWorld("electron", {
   saveManualBitcoinPrice: (price: number) =>
     ipcInvoke("saveManualBitcoinPrice", price),
   
+  createBalanceChangeEvent: (
+    amountSats: number,
+    valueCents: number | null,
+    type: 'buy' | 'sell' | 'fee',
+    memo: string | null
+  ) => ipcInvoke("createBalanceChangeEvent", amountSats, valueCents, type, memo),
+
+  getBalanceChangeEvents: (page?: number, limit?: number) =>
+    ipcInvoke("getBalanceChangeEvents", page, limit),
+  
   // enableSatTrader: (bool: boolean) => ipcInvoke("enableSatTrader"),
 } satisfies Window["electron"]);
 

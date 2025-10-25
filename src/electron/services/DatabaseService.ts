@@ -3,6 +3,7 @@ import { getAppDataFolder } from "../pathResolver.js";
 import { Sequelize, DataTypes } from "sequelize";
 import { ipcWebContentsSend } from "../util.js";
 import { BrowserWindow } from "electron";
+import { v4 as uuidv4 } from 'uuid';
 
 class DatabaseService {
   private sequelize: Sequelize;
@@ -175,6 +176,48 @@ class DatabaseService {
     );
   }
 
+  public async createBalanceChangeEvent(
+    amountSats: number,
+    valueCents: number | null,
+    type: 'buy' | 'sell' | 'fee',
+    memo: string | null
+  ): Promise<BalanceChangeEvent> {
+    await this.awaitDatabaseReady();
+
+    const event = await this.sequelize.models.BalanceChangeEvent.create({
+      id: uuidv4(),
+      amountSats,
+      valueCents,
+      type,
+      memo,
+      createdAt: new Date(),
+    });
+
+    await this.pushLatestHeadlineStatsToUI();
+    return event.toJSON() as BalanceChangeEvent;
+  }
+
+  public async getBalanceChangeEvents(
+    page: number = 1,
+    limit: number = 20
+  ): Promise<{ events: BalanceChangeEvent[], total: number, totalPages: number }> {
+    await this.awaitDatabaseReady();
+
+    const offset = (page - 1) * limit;
+    
+    const { count, rows } = await this.sequelize.models.BalanceChangeEvent.findAndCountAll({
+      order: [["createdAt", "DESC"]],
+      limit,
+      offset,
+    });
+
+    return {
+      events: rows.map(event => event.toJSON() as BalanceChangeEvent),
+      total: count,
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
   private async pushLatestHeadlineStatsToUI(): Promise<void> {
     await this.awaitDatabaseReady();
     ipcWebContentsSend(
@@ -273,6 +316,35 @@ class DatabaseService {
         allowNull: false,
       },
     });
+
+    sequelize.define("BalanceChangeEvent", {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
+      amountSats: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      valueCents: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      type: {
+        type: DataTypes.ENUM('buy', 'sell', 'fee'),
+        allowNull: false,
+      },
+      memo: {
+        type: DataTypes.STRING,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+    });
+
+    
 
     // sequelize.define("Features", {
     //   id: {
